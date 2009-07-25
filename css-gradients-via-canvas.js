@@ -53,11 +53,14 @@ if(!canvas.getContext || !canvas.toDataURL){
 	return;
 }
 
+var domLoaded = false;
+
 //Detect support for data: URI
 var testDataURI = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
 var img = new Image();
 img.onload = img.onerror = function(){
 	cssGradientsViaCanvas.supportsDataURI = (this.width == 1 && this.height == 1);
+	provideGradientsViaCanvas();
 }
 img.src = testDataURI;
 
@@ -66,10 +69,18 @@ img.src = testDataURI;
 // and for each create Canvases or attempt to load the cached canvas from the
 // server.
 var initalized = false;
-function provideGradientsViaCanvas(){
-	if(initalized)
+function provideGradientsViaCanvas(evt){
+	if(evt && evt.type == 'DOMContentLoaded')
+		domLoaded = true;
+	
+	// Don't run until the data: URI test above has been executed, or if this
+	// is not the result of DOMContentLoaded event, or if function has already
+	// been run in its entirety
+	if(cssGradientsViaCanvas.supportsDataURI == null || !domLoaded || initalized)
 		return;
 	initalized = true;
+	
+	//Abort if data: URIs aren't supported
 	if(!cssGradientsViaCanvas.supportsDataURI){
 		if(window.console && console.info)
 			console.info('This browser does not support data: URIs, therefore CSS Gradients via Canvas will not work.');
@@ -93,7 +104,8 @@ function provideGradientsViaCanvas(){
 	
 	//Remove all comments and whitespace from a string
 	function normalizeWhitespace(str){
-		str = str.replace(/\/\*(.|\s)*?\*\//, ''); //Remove comments
+		str = str.replace(/\/\*(.|\s)*?\*\//g, ''); //Remove comments
+		str = str.replace(/^\s*\*\//, ''); //Remove trailing comment after closing curly brace
 		str = str.replace(/\s+/g, ' ').replace(/^ | $/g, ''); //Trim whitespace
 		return str;
 	}
@@ -107,10 +119,12 @@ function provideGradientsViaCanvas(){
 	
 	//Get the best-available querySelectorAll 
 	function querySelectorAll(selector){
-		if(document.querySelectorAll)
+		if(false&&document.querySelectorAll)
 			return document.querySelectorAll(selector);
 		else if(window.jQuery)
 			return jQuery(selector).get();
+		else if(window.Sizzle)
+			return Sizzle(selector);
 		else if(window.Prototype && window.$$)
 			return $$(selector);
 		else
