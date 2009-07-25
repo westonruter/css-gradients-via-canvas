@@ -338,5 +338,10 @@ function provideGradientsViaCanvas(evt){
 } //end function provideGradientsViaCanvas
 if(document.addEventListener)
 	document.addEventListener('DOMContentLoaded', provideGradientsViaCanvas, false);
+else if(window.attachEvent){
+	window.attachEvent('onload', function(){
+		provideGradientsViaCanvas({type:'DOMContentLoaded'});
+	});
+}
 
 })();
