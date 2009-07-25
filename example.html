@@ -36,7 +36,7 @@
 	
 	<p>CSS Gradients via Canvas works by parsing all stylesheets upon page load (<code>DOMContentLoaded</code>), and searches for all instances of CSS gradients being
 	used as <em>background images</em>. The source code for the external stylesheets is loaded via <code>XMLHttpRequest</code>—ensure that they are
-	cached by serving them with a <a ref="http://developer.yahoo.com/performance/rules.html#expires">far-future Expires</a> header to avoid extra HTTP traffic.
+	cached by serving them with a <a href="http://developer.yahoo.com/performance/rules.html#expires">far-future Expires</a> header to avoid extra HTTP traffic.
 	The CSS selector associated with the gradient background image property is used to query all elements on the page; for each of the selected elements,
 	a canvas is created of the same size as the element's dimensions, and the specified gradients are drawn onto that canvas. Thereafter, the gradient image is
 	retrieved via <code>canvas.toDataURL()</code> and this data is supplied as the <code>background-image</code> for the element.</p>
