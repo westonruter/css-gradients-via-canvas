@@ -30,29 +30,47 @@
 					   -webkit-gradient(radial, 0 150, 50, 0 140, 90, from(#f4f201), to(rgba(228, 199,0,0)), color-stop(80%, #e4c700)); }
 	
 	
-	/*Play around with some interactivity; requires manual event handlers to be attached with Javascript, see footer: */
-	html:not(.css-gradients-via-canvas) #linear1:hover, #linear1.gradient-hover {height:200px;}
-	html:not(.css-gradients-via-canvas) #linear2:hover, #linear2.gradient-hover {height:300px;}
-	html:not(.css-gradients-via-canvas) #radial1:hover, #radial1.gradient-hover {height:400px; width:400px;}
+	/* Play around with some interactivity; requires manual mouseover/mouseout
+	handlers to be attached with Javascript to refresh CSS Gradients when box
+	is resized, see script and comments in footer. */
+	#linear2 {
+		border-color:gray;
+		border-style:outset;
+		cursor:pointer;
+	}
+	html:not(.css-gradients-via-canvas) #linear2:active,
+	#linear2.mousedown {
+		width:400px;
+		border-style:inset;
+	}
 	</style>
 </head>
 <body>
+	
     <h1>CSS Gradients via Canvas</h1>
-	<p>This project seeks to implement WebKit's <a href="http://webkit.org/blog/175/introducing-css-gradients/" title="Introducing CSS Gradients">CSS Gradients proposal</a>
-	in browsers that do implement the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html">canvas API</a>. Simply include
-	<a href="css-gradients-via-canvas.js">css-gradients-via-canvas.js</a> on a page that has <code>document.querySelectorAll</code> available (looks for jQuery, Prototype,
-	or Sizzle otherwise to query selectors).</p>
+	<p>This project implements a subset of WebKit's <a href="http://webkit.org/blog/175/introducing-css-gradients/" title="Introducing CSS Gradients">CSS Gradients proposal</a>
+	in browsers that implement the HTML5 <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html"><code>canvas</code> element</a>.
+	To use, simply include <a href="css-gradients-via-canvas.js">css-gradients-via-canvas.js</a> on a page that has <code>document.querySelectorAll</code> available
+	or one that includes jQuery, Prototype, or Sizzle; if you ensure <code>document.querySelectorAll</code> is available, this implementation has no external dependencies.</p>
 	
-	<p>Works in Firefox 3.5, but should also work in Firefox 3.0 and Opera.</p>
+	<p>CSS Gradients via Canvas works in Firefox 2/3+, and Opera 9.64. Safari and Chrome have native implementations of CSS Gradients since they employ WebKit.
+	This implementation does <em>not</em> work in Internet Explorer since it does not support Canvas, although IE8 does support data: URIs, which is a prerequisite.
+	When/if Gears' <a href="http://code.google.com/apis/gears/api_canvas.html">Canvas API</a> fully implements the HTML5 canvas specification, then this implementation
+	should be tweakable to work in IE8. In the mean time, rudamentary gradients may be achived in IE by means of its non-standard
+	<a href="http://msdn.microsoft.com/en-us/library/ms532997%28VS.85%29.aspx">gradient filter</a> functionality.</p>
 	
-	<p>The following two boxes are the two <a href="http://trac.webkit.org/browser/trunk/LayoutTests//fast/gradients/simple-gradients.html?format=raw">Background
-	Gradients Examples</a> from WebKit <small>(disabling a couple WebKit-only
-	background-* properties in the first example)</small>:</p>
+	<p>The implementation works by parsing all stylesheets upon page load (<code>DOMContentLoaded</code>), and searches for all instances of CSS gradients being
+	used as <em>background images</em> (unlike WebKit, this implementation does not allow you to use gradients for border images, list bullets, or generated content).
+	All elements that 
+	</p>
+	
+	<h2>Examples</h2>
+	<p>The following two boxes are from the <a href="http://trac.webkit.org/browser/trunk/LayoutTests//fast/gradients/simple-gradients.html?format=raw">Background
+	Gradients Example</a> from WebKit <small>(disabling a couple WebKit-only background-* properties in the first example)</small>:</p>
 	<p id="linear1" class='gradient'></p>
 	<p id="radial1" class='gradient'></p>
 	
-	
-	<p>Here is a bonus diagonal rainbow!</p>
+	<p>Here is a bonus diagonal rainbow! Clicking on the element causes its width to increase and its gradient will be adjusted.</p>
 	<p id="linear2" class='gradient'></p>
 	
 	<hr />
@@ -67,12 +85,14 @@
 	
 	<script src="css-gradients-via-canvas.js"></script>
 	<script>
-	//Try modifying the way the 
+	//Add mousedown/mouseup event handlers to correspond with the :active rule that changes the element's width
+	// because the CSS Gradient needs to be refreshed because the box size changes; note that we add the class manually
+	// because CSS rules aren't applied before the corresponding events are triggered (thus the box would not
+	// be resized when the event handler inspects it).
 	jQuery(function($){
-		$('.gradient').hover(
-			function(){ $(this).addClass('gradient-hover');    if(this.refreshCssGradient) this.refreshCssGradient(); },
-			function(){ $(this).removeClass('gradient-hover'); if(this.refreshCssGradient) this.refreshCssGradient(); }
-		)
+		$('#linear2')
+		  .mousedown(function(){ $(this).addClass('mousedown');    if(this.refreshCssGradient) this.refreshCssGradient(); })
+		  .mouseup(function(){   $(this).removeClass('mousedown'); if(this.refreshCssGradient) this.refreshCssGradient(); });
 	});
 	</script>
 </body>

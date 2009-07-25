@@ -1,6 +1,7 @@
 /* 
  * CSS Gradients via Canvas
  *  by Weston Ruter, Shepherd Interactive <http://www.shepherd-interactive.com/>
+ *  http://shepherd-interactive.googlecode.com/svn/trunk/css-gradients-via-canvas/
  * 
  * Some comments include excerpts from "Introducing CSS Gradients" <http://webkit.org/blog/175/introducing-css-gradients/>
  * 
@@ -24,40 +25,46 @@ var cssGradientsViaCanvas = {
 	hasNativeSupport: null,
 	supportsDataURI: null,
 	supportsCanvas: null,
-	oninit: null
+	enabled: null,
+	proprietaryPropertyPrefixes: ['webkit', 'moz', 'o', 'ms'],
+	oninit: function(){ //user-overridable initialization callback function
+		if(this.enabled)
+			document.documentElement.className += " css-gradients-via-canvas";
+		else if(this.hasNativeSupport)
+			document.documentElement.className += " native-css-gradients";
+		else
+			document.documentElement.className += " no-css-gradients";
+	},
+	createCanvas: function(){ //in case a non-native implementation is available, author can override this
+		return document.createElement('canvas');
+	}
 };
 
 (function(){
+var config = cssGradientsViaCanvas;
+
 //Check to see if CSS Gradients are natively supported
 var testGradient = "linear, 0% 0%, 0% 100%, from(#000), to(#fff)";
 var div = document.createElement('div');
 div.style.cssText = 'background-image:gradient("' + testGradient + '");';
 if(div.style.backgroundImage){
-	cssGradientsViaCanvas.hasNativeSupport = true;
+	config.enabled = false;
+	config.hasNativeSupport = true;
+	if(config.oninit)
+		config.oninit();
 	return;
 }
-var prefixes = ['webkit', 'moz', 'o', 'ms'];
-for(var i = 0; i < prefixes.length; i++){
-	div.style.cssText = 'background-image:-' + prefixes[i] + '-gradient(' + testGradient + ');';
+for(var i = 0; i < config.proprietaryPropertyPrefixes.length; i++){
+	div.style.cssText = 'background-image:-' + config.proprietaryPropertyPrefixes[i] + '-gradient(' + testGradient + ');';
 	if(div.style.backgroundImage){
-		cssGradientsViaCanvas.hasNativeSupport = true;
-		//document.documentElement.className += " native-css-gradients";
+		config.enabled = false;
+		config.hasNativeSupport = true;
+		if(config.oninit)
+			config.oninit();
 		return;
 	}
 }
-cssGradientsViaCanvas.hasNativeSupport = false;
-
-//Detect support for canvas
-var canvas = document.createElement('canvas');
-cssGradientsViaCanvas.supportsCanvas = (canvas.getContext && canvas.toDataURL);
-if(!cssGradientsViaCanvas.supportsCanvas){
-	if(window.console && console.info)
-		console.info('This browser does not support canvas, therefore CSS Gradients via Canvas will not work.');
-	if(cssGradientsViaCanvas.oninit)
-		cssGradientsViaCanvas.oninit(false/*failure*/);
-	document.documentElement.className += " no-css-gradients";
-	return;
-}
+config.hasNativeSupport = false;
 
 var domLoaded = false;
 
@@ -65,7 +72,7 @@ var domLoaded = false;
 var testDataURI = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
 var img = new Image();
 img.onload = img.onerror = function(){
-	cssGradientsViaCanvas.supportsDataURI = (this.width == 1 && this.height == 1);
+	config.supportsDataURI = (this.width == 1 && this.height == 1);
 	provideGradientsViaCanvas();
 }
 img.src = testDataURI;
@@ -81,17 +88,29 @@ function provideGradientsViaCanvas(evt){
 	// Don't run until the data: URI test above has been executed, or if this
 	// is not the result of DOMContentLoaded event, or if function has already
 	// been run in its entirety
-	if(cssGradientsViaCanvas.supportsDataURI == null/*not checked yet*/ || !domLoaded || initalized)
+	if(config.supportsDataURI == null/*not checked yet*/ || !domLoaded || initalized)
 		return;
 	initalized = true;
 	
+	//Detect support for canvas
+	var canvas = config.createCanvas();
+	config.supportsCanvas = (canvas.getContext && canvas.toDataURL);
+	if(!config.supportsCanvas){
+		if(window.console && console.info)
+			console.info('This browser does not support canvas, therefore CSS Gradients via Canvas will not work.');
+		config.enabled = false;
+		if(config.oninit)
+			config.oninit();
+		return;
+	}
+	
 	//Abort if data: URIs aren't supported
-	if(!cssGradientsViaCanvas.supportsDataURI){
+	if(!config.supportsDataURI){
 		if(window.console && console.info)
 			console.info('This browser does not support data: URIs, therefore CSS Gradients via Canvas will not work.');
-		if(cssGradientsViaCanvas.oninit)
-			cssGradientsViaCanvas.oninit(false/*failure*/);
-		document.documentElement.className += " no-css-gradients";
+		config.enabled = false;
+		if(config.oninit)
+			config.oninit();
 		return;
 	}
 
@@ -168,7 +187,7 @@ function provideGradientsViaCanvas(evt){
 	
 	
 	//Parse the stylesheets for CSS Gradients
-	var reProperty = /([^}]+){[^}]*?((?=(?:-\w+-)?gradient)[^;]+)/g;
+	var reProperty = /([^}]+){[^}]*?([a-z\-]*background[a-z\-]*)\s*:\s*((?:-\w+-)?gradient[^;]+)/g; //([a-z\-]*background[a-z\-]*):
 	var reGradient = /gradient\((radial|linear),(\S+) ([^,]+)(?:,(\d+\.?\d*))?,(\S+) ([^,]+)(?:,(\d+\.?\d*))?,(.+?)\)(?=\s*$|\s*,\s*(?:-\w+-)?gradient)/g; //don't look at this regular expression :-)
 	var reColorStop = /(?:(from|to)\((\w+\(.+?\)|.+?)\)|color-stop\((\d*\.?\d*)(%)?,(\w+\(.+?\)|.+?)\))(?=,|$)/g;
 	
@@ -200,7 +219,8 @@ function provideGradientsViaCanvas(evt){
 		var ruleMatch, propertyMatch, colorStopMatch;
 		while(ruleMatch = reProperty.exec(sheetCssText)){
 			var selector = normalizeWhitespace(ruleMatch[1]);
-			var propertyValue = normalizeWhitespace(ruleMatch[2]).toLowerCase().replace(/\s*(,|\(\))\s*/g, '$1');
+			var propertyName = ruleMatch[2];
+			var propertyValue = normalizeWhitespace(ruleMatch[3]).toLowerCase().replace(/\s*(,|:|\(\))\s*/g, '$1');
 			
 			var selectedElements = querySelectorAll(selector);
 			if(!selectedElements.length)
@@ -259,7 +279,7 @@ function provideGradientsViaCanvas(evt){
 					// Provide a function on the selected element for refreshing
 					// the CSS gradient. This is also used for the initial paint.
 					el.refreshCssGradient = function(){
-						var canvas = document.createElement('canvas');
+						var canvas = config.createCanvas();
 						var computedStyle = document.defaultView.getComputedStyle(this, null);
 						canvas.width  = parseInt(computedStyle.width) + parseInt(computedStyle.paddingLeft) + parseInt(computedStyle.paddingRight);
 						canvas.height = parseInt(computedStyle.height) + parseInt(computedStyle.paddingTop) + parseInt(computedStyle.paddingBottom);
@@ -311,9 +331,9 @@ function provideGradientsViaCanvas(evt){
 	}); //end forEach(document.styleSheets...
 	
 	//Success
-	document.documentElement.className += " css-gradients-via-canvas";
-	if(cssGradientsViaCanvas.oninit)
-		cssGradientsViaCanvas.oninit(true/*success*/);
+	config.enabled = true;
+	if(config.oninit)
+		config.oninit();
 	
 } //end function provideGradientsViaCanvas
 if(document.addEventListener)
