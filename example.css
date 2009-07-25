@@ -8,7 +8,10 @@
 #linear1 { width:130px; height:130px; border:2px solid black; padding: 10px; 
 	   background:-webkit-gradient(linear, left top, left bottom, from(#00abeb), to(#fff), color-stop(0.5, #fff), color-stop(0.5, #66cc00));
 	   /*-webkit-background-origin: padding-box; -webkit-background-clip: content-box;*/ }
-	   
+
+#linear1:hover {
+	height:200px;
+}
 
 #linear2 {
 		border:2px solid black;
@@ -20,7 +23,10 @@
 								 color-stop(.4, yellow),
 								 color-stop(.6, green),
 								 color-stop(.8, blue));
-
+}
+#linear2:hover {
+	height:300px;
+	width:400px;
 }
 
 #radial1 { width:150px; height:150px; border:2px solid black;

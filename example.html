@@ -3,18 +3,12 @@
 <head>
     <title>CSS Gradients via Canvas</title>
 	<style>
-	.gradient {
-		width:130px;
-		height:130px;
-	}
-	
 	#linear1 { width:130px; height:130px; border:2px solid black; padding: 10px; 
 		   background:-webkit-gradient(linear, left top, left bottom, from(#00abeb), to(#fff), color-stop(0.5, #fff), color-stop(0.5, #66cc00));
 		   background:-moz-gradient(linear, left top, left bottom, from(#00abeb), to(#fff), color-stop(0.5, #fff), color-stop(0.5, #66cc00));
 		   background:-o-gradient(linear, left top, left bottom, from(#00abeb), to(#fff), color-stop(0.5, #fff), color-stop(0.5, #66cc00));
 		   background:gradient(linear, left top, left bottom, from(#00abeb), to(#fff), color-stop(0.5, #fff), color-stop(0.5, #66cc00));
 		   /*-webkit-background-origin: padding-box; -webkit-background-clip: content-box;*/ }
-		   
 	
 	#linear2 {
 			border:2px solid black;
@@ -34,9 +28,13 @@
 					   -webkit-gradient(radial, 105 105, 20, 112 120, 50, from(#ff5f98), to(rgba(255,1,136,0)), color-stop(75%, #ff0188)),
 					   -webkit-gradient(radial, 95 15, 15, 102 20, 40, from(#00c9ff), to(rgba(0,201,255,0)), color-stop(80%, #00b5e2)),
 					   -webkit-gradient(radial, 0 150, 50, 0 140, 90, from(#f4f201), to(rgba(228, 199,0,0)), color-stop(80%, #e4c700)); }
-
+	
+	
+	/*Play around with some interactivity; requires manual event handlers to be attached with Javascript, see footer: */
+	html:not(.css-gradients-via-canvas) #linear1:hover, #linear1.gradient-hover {height:200px;}
+	html:not(.css-gradients-via-canvas) #linear2:hover, #linear2.gradient-hover {height:300px;}
+	html:not(.css-gradients-via-canvas) #radial1:hover, #radial1.gradient-hover {height:400px; width:400px;}
 	</style>
-	<link rel="stylesheet" type="text/css" href="example.css" />
 </head>
 <body>
     <h1>CSS Gradients via Canvas</h1>
@@ -69,9 +67,13 @@
 	
 	<script src="css-gradients-via-canvas.js"></script>
 	<script>
-	var el = document.getElementById('linear1');
-	el.onmouseover = function(){ this.style.height="200px"; this.refreshCssGradient() };
-	el.onmouseout = function(){ this.style.height="130px"; this.refreshCssGradient() };
+	//Try modifying the way the 
+	jQuery(function($){
+		$('.gradient').hover(
+			function(){ $(this).addClass('gradient-hover');    if(this.refreshCssGradient) this.refreshCssGradient(); },
+			function(){ $(this).removeClass('gradient-hover'); if(this.refreshCssGradient) this.refreshCssGradient(); }
+		)
+	});
 	</script>
 </body>
 </html>

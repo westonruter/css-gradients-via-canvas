@@ -20,15 +20,11 @@
  * $Id$
  */
 
-if(!window.console){
-	console = {
-		info:function(x){alert(x)}
-	}
-}
-
 var cssGradientsViaCanvas = {
 	hasNativeSupport: null,
-	supportsDataURI: null
+	supportsDataURI: null,
+	supportsCanvas: null,
+	oninit: null
 };
 
 (function(){
@@ -45,6 +41,7 @@ for(var i = 0; i < prefixes.length; i++){
 	div.style.cssText = 'background-image:-' + prefixes[i] + '-gradient(' + testGradient + ');';
 	if(div.style.backgroundImage){
 		cssGradientsViaCanvas.hasNativeSupport = true;
+		//document.documentElement.className += " native-css-gradients";
 		return;
 	}
 }
@@ -52,9 +49,13 @@ cssGradientsViaCanvas.hasNativeSupport = false;
 
 //Detect support for canvas
 var canvas = document.createElement('canvas');
-if(!canvas.getContext || !canvas.toDataURL){
+cssGradientsViaCanvas.supportsCanvas = (canvas.getContext && canvas.toDataURL);
+if(!cssGradientsViaCanvas.supportsCanvas){
 	if(window.console && console.info)
 		console.info('This browser does not support canvas, therefore CSS Gradients via Canvas will not work.');
+	if(cssGradientsViaCanvas.oninit)
+		cssGradientsViaCanvas.oninit(false/*failure*/);
+	document.documentElement.className += " no-css-gradients";
 	return;
 }
 
@@ -71,8 +72,7 @@ img.src = testDataURI;
 
 
 // Once the page loads: search the stylesheets for instances of CSS gradients,
-// and for each create Canvases or attempt to load the cached canvas from the
-// server.
+// and then apply those gradients to their selected elements.
 var initalized = false;
 function provideGradientsViaCanvas(evt){
 	if(evt && evt.type == 'DOMContentLoaded')
@@ -81,7 +81,7 @@ function provideGradientsViaCanvas(evt){
 	// Don't run until the data: URI test above has been executed, or if this
 	// is not the result of DOMContentLoaded event, or if function has already
 	// been run in its entirety
-	if(cssGradientsViaCanvas.supportsDataURI == null || !domLoaded || initalized)
+	if(cssGradientsViaCanvas.supportsDataURI == null/*not checked yet*/ || !domLoaded || initalized)
 		return;
 	initalized = true;
 	
@@ -89,6 +89,9 @@ function provideGradientsViaCanvas(evt){
 	if(!cssGradientsViaCanvas.supportsDataURI){
 		if(window.console && console.info)
 			console.info('This browser does not support data: URIs, therefore CSS Gradients via Canvas will not work.');
+		if(cssGradientsViaCanvas.oninit)
+			cssGradientsViaCanvas.oninit(false/*failure*/);
+		document.documentElement.className += " no-css-gradients";
 		return;
 	}
 
@@ -124,7 +127,7 @@ function provideGradientsViaCanvas(evt){
 	
 	//Get the best-available querySelectorAll 
 	function querySelectorAll(selector){
-		if(false&&document.querySelectorAll)
+		if(document.querySelectorAll)
 			return document.querySelectorAll(selector);
 		else if(window.jQuery)
 			return jQuery(selector).get();
@@ -252,7 +255,9 @@ function provideGradientsViaCanvas(evt){
 
 			//Iterate over all of the selected elements and apply the gradients to each
 			forEach(selectedElements, function(el){
-				//(function(){
+				(function(gradients){
+					// Provide a function on the selected element for refreshing
+					// the CSS gradient. This is also used for the initial paint.
 					el.refreshCssGradient = function(){
 						var canvas = document.createElement('canvas');
 						var computedStyle = document.defaultView.getComputedStyle(this, null);
@@ -289,6 +294,8 @@ function provideGradientsViaCanvas(evt){
 							forEach(gradient.colorStops, function(cs){
 								canvasGradient.addColorStop(cs.stop, cs.color);
 							});
+							
+							//Paint the gradient
 							ctx.fillStyle = canvasGradient;
 							ctx.fillRect(0,0,canvas.width,canvas.height);
 							
@@ -298,15 +305,18 @@ function provideGradientsViaCanvas(evt){
 						this.style.backgroundImage = "url('" + canvas.toDataURL() + "')";
 					};
 					el.refreshCssGradient();
-				//})();
+				})(gradients);
 			}); //end forEach(selectedElements... 
 		} //end while(ruleMatch = reProperty.exec(sheetCssText))
 	}); //end forEach(document.styleSheets...
 	
-}
-if(document.addEventListener){
+	//Success
+	document.documentElement.className += " css-gradients-via-canvas";
+	if(cssGradientsViaCanvas.oninit)
+		cssGradientsViaCanvas.oninit(true/*success*/);
+	
+} //end function provideGradientsViaCanvas
+if(document.addEventListener)
 	document.addEventListener('DOMContentLoaded', provideGradientsViaCanvas, false);
-	window.addEventListener('DOMContentLoaded', provideGradientsViaCanvas, false);
-}
 
 })();
