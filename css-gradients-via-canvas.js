@@ -68,7 +68,7 @@ config.hasNativeSupport = false;
 
 var domLoaded = false;
 
-//Detect support for data: URI
+//Detect support for data: URI; see: http://weston.ruter.net/2009/05/07/detecting-support-for-data-uris/
 var testDataURI = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
 var img = new Image();
 img.onload = img.onerror = function(){

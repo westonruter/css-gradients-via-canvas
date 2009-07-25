@@ -28,14 +28,14 @@
 	if this function is implemented; otherwise, it looks for the presence of jQuery, Prototype, or Sizzle to provide selector-querying functionality.</p>
 	
 	<p id="browser-support">The implementation works in Firefox 2/3+ and Opera 9.64 (at least). Safari and Chrome have native support for CSS Gradients since they use WebKit, as already mentiond.
-	This implementation does <em>not</em> work in Internet Explorer since IE does not support Canvas, although IE8 does support the <code>data:</code> URI scheme, which is a prerequisite.
-	(I incorporate the previously-posted way to <a href="http://weston.ruter.net/2009/05/07/detecting-support-for-data-uris/" title="Detecting Support for data: URIs">detect for support</a>.)
+	This implementation does <em>not</em> work in Internet Explorer since IE does not support Canvas, although IE8 does support the <code>data:</code> URI scheme, which is a prerequisite
+	(see <a href="http://weston.ruter.net/2009/05/07/detecting-support-for-data-uris/" title="Detecting Support for data: URIs">support detection method</a>).
 	When/if Gears's <a href="http://code.google.com/apis/gears/api_canvas.html">Canvas API</a> fully implements the HTML5 canvas specification, then this implementation
 	should be tweakable to work in IE8. In the mean time, rudimentary gradients may be achieved in IE by means of its non-standard
 	<a href="http://msdn.microsoft.com/en-us/library/ms532997%28VS.85%29.aspx">gradient filter</a>.</p>
 	
 	<p>CSS Gradients via Canvas works by parsing all stylesheets upon page load (<code>DOMContentLoaded</code>), and searches for all instances of CSS gradients being
-	used as <em>background images</em>. The source code for the external stylesheets is loaded via XMLHttpRequest—ensure that they are
+	used as <em>background images</em>. The source code for the external stylesheets is loaded via <code>XMLHttpRequest</code>—ensure that they are
 	cached by serving them with a <a ref="http://developer.yahoo.com/performance/rules.html#expires">far-future Expires</a> header to avoid extra HTTP traffic.
 	The CSS selector associated with the gradient background image property is used to query all elements on the page; for each of the selected elements,
 	a canvas is created of the same size as the element's dimensions, and the specified gradients are drawn onto that canvas. Thereafter, the gradient image is
@@ -139,11 +139,24 @@
 	// because the CSS Gradient needs to be refreshed because the box size changes; note that we add the class manually
 	// because CSS rules aren't applied before the corresponding events are triggered (thus the box would not
 	// be resized when the event handler inspects it).
-	jQuery(function($){
-		$('#linear2')
-		  .mousedown(function(){ $(this).addClass('mousedown');    if(this.refreshCSSGradient) this.refreshCSSGradient(); })
-		  .mouseup(function(){   $(this).removeClass('mousedown'); if(this.refreshCSSGradient) this.refreshCSSGradient(); });
-	});
+	
+	if(document.addEventListener){
+		document.addEventListener('DOMContentLoaded', function(){
+			var linear2 = document.getElementById('linear2');
+			linear2.addEventListener('mouseup', function(){
+				if(this.refreshCSSGradient){
+					this.className = this.className.replace(/\s*mousedown/, '');
+					this.refreshCSSGradient();
+				}
+			}, false);
+			linear2.addEventListener('mousedown', function(){
+				if(this.refreshCSSGradient){
+					this.className += " mousedown";
+					this.refreshCSSGradient();
+				}
+			}, false);
+		}, false);
+	}
 	</script>
 	</div><!-- end examples -->
 	
