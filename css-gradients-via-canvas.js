@@ -82,8 +82,6 @@ img.src = testDataURI;
 // and then apply those gradients to their selected elements.
 var initalized = false;
 function provideGradientsViaCanvas(evt){
-	if(config.enabled == false)
-		return;
 	if(evt && evt.type == 'DOMContentLoaded')
 		domLoaded = true;
 	
@@ -340,6 +338,5 @@ function provideGradientsViaCanvas(evt){
 } //end function provideGradientsViaCanvas
 if(document.addEventListener)
 	document.addEventListener('DOMContentLoaded', provideGradientsViaCanvas, false);
-
 
 })();
