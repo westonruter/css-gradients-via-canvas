@@ -2,10 +2,15 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
+	<meta name="robots" content="follow,noindex" /><!-- see: http://weston.ruter.net/projects/css-gradients-via-canvas/ -->
     <title>CSS Gradients via Canvas</title>
 </head>
 <body>
     <h1>CSS Gradients via Canvas</h1>
+	
+	<p><em>(Cross-posted at <a href="http://weston.ruter.net/projects/css-gradients-via-canvas/">http://weston.ruter.net/projects/css-gradients-via-canvas/</a>)</em></p>
+
+	<!-- begin -->
 	
 	<p>In a current project at <a href="http://shepherd-interactive.com/">Shepherd Interactive</a>, certain page elements were designed with
 	background <a href="http://en.wikipedia.org/wiki/Image_gradient" title="Image gradient @ Wikipedia">gradients</a>.
@@ -45,7 +50,8 @@
 	Toggling an element's class name by scripting is how you can assure that its style will be changed before calling <code>refreshCSSGradient()</code>. The
 	<a href="#linear2">last example</a> below demonstrates how this.</p>
 	
-	<h3 id="examples">Examples</h3>
+	<div id="examples">
+	<h3>Examples</h3>
 	<style scoped="scoped">
 	p {
 		line-height:1.2em;
@@ -139,6 +145,9 @@
 		  .mouseup(function(){   $(this).removeClass('mousedown'); if(this.refreshCSSGradient) this.refreshCSSGradient(); });
 	});
 	</script>
+	</div><!-- end examples -->
+	
+	<!-- end -->
 	
 	<hr />
 	<footer>
