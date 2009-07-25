@@ -117,15 +117,15 @@
 	<p>The following two boxes are from the <a href="http://trac.webkit.org/browser/trunk/LayoutTests//fast/gradients/simple-gradients.html?format=raw">Background
 	Gradients Example</a> from WebKit <small>(a couple browser-specific <code>background</code> properties are disabled in the first example)</small>:</p>
 	
-	<p id='fallback-notice' style="display:none">It appears that your browser doesn't support CSS Gradients, neither natively nor via Canvas.
+	<p id='fallback-notice' hidden="hidden" style="display:none"><em>It appears that your browser doesn't support CSS Gradients, neither natively nor via Canvas.
 	The gradients you see below are regular externally-loaded PNG images that demonstrate the CSS gradient effects; the gradients were generated from
-	this Canvas implementation of CSS Gradients (see <a href="#browser-support">browser support</a> above).</p>
+	this Canvas implementation of CSS Gradients (see <a href="#browser-support">browser support</a> above).</em></p>
 	
 	<p id="linear1" class='gradient'><img src="linear1.png" class='fallback' style="display:none" title="Fallback image; this is not a CSS Gradient!" /></p>
 	<p id="radial1" class='gradient'><img src="radial1.png" class='fallback' style="display:none" title="Fallback image; this is not a CSS Gradient!" /></p>
 	
 	<p>Here is a bonus diagonal rainbow…but wait, there's more! Clicking on the element causes its width to increase and when it does, its gradient is adjusted (see <a href="#notes">notes</a> above).
-	<span class='fallback-notice' style="display:none;">(Clicking will not have the desired effect because, again, it appears your browser is not supported.)</span></p>
+	<em hidden="hidden" class='fallback-notice' style="display:none;">(Clicking will not have the desired effect because, again, it appears your browser is not supported.)</em></p>
 	
 	<p id="linear2" class='gradient'><img src="linear2.png" class='fallback' style="display:none" title="Fallback image; this is not a CSS Gradient!" /></p>
 	
