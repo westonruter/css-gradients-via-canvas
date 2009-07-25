@@ -3,14 +3,48 @@
 <head>
     <title>CSS Gradients via Canvas</title>
 	<style>
+	.gradient {
+		width:130px;
+		height:130px;
+	}
+	
+	#linear1 { width:130px; height:130px; border:2px solid black; padding: 10px; 
+		   background:-webkit-gradient(linear, left top, left bottom, from(#00abeb), to(#fff), color-stop(0.5, #fff), color-stop(0.5, #66cc00));
+		   /*-webkit-background-origin: padding-box; -webkit-background-clip: content-box;*/ }
+		   
+	
+	#linear2 {
+			border:2px solid black;
+			width:130px; height:130px;
+			background-image: -webkit-gradient(linear, 0% 25%, 75% 100%,
+									 from(red),
+									 to(purple),
+									 color-stop(.2, orange),
+									 color-stop(.4, yellow),
+									 color-stop(.6, green),
+									 color-stop(.8, blue));
+	
+	}
+	
+	#radial1 { width:150px; height:150px; border:2px solid black;
+		   background: -webkit-gradient(radial, 45 45, 10, 52 50, 30, from(#A7D30C), to(rgba(1,159,98,0)), color-stop(90%, #019F62)),
+					   -webkit-gradient(radial, 105 105, 20, 112 120, 50, from(#ff5f98), to(rgba(255,1,136,0)), color-stop(75%, #ff0188)),
+					   -webkit-gradient(radial, 95 15, 15, 102 20, 40, from(#00c9ff), to(rgba(0,201,255,0)), color-stop(80%, #00b5e2)),
+					   -webkit-gradient(radial, 0 150, 50, 0 140, 90, from(#f4f201), to(rgba(228, 199,0,0)), color-stop(80%, #e4c700)); }
 
 	</style>
 	<link rel="stylesheet" type="text/css" href="example.css" />
 </head>
 <body>
     <h1>CSS Gradients via Canvas</h1>
+	<p>This project seeks to implement WebKit's <a href="http://webkit.org/blog/175/introducing-css-gradients/" title="Introducing CSS Gradients">CSS Gradients proposal</a>
+	in browsers that do implement the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html">canvas API</a>.
 	
-	<p>The following two boxes are the two <a href="http://trac.webkit.org/browser/trunk/LayoutTests//fast/gradients/simple-gradients.html?format=raw">Background Gradients Example</a> from WebKit <small>(disabling a couple WebKit-only background-* properties in the first example)</small>:</p>
+	</p>
+	
+	<p>The following two boxes are the two <a href="http://trac.webkit.org/browser/trunk/LayoutTests//fast/gradients/simple-gradients.html?format=raw">Background
+	Gradients Examples</a> from WebKit <small>(disabling a couple WebKit-only
+	background-* properties in the first example)</small>:</p>
 	<p id="linear1" class='gradient'></p>
 	<p id="radial1" class='gradient'></p>
 	
@@ -21,7 +55,7 @@
 	<hr />
 	<footer>
 		<address><a href="http://weston.ruter.net/" rel="author">Weston Ruter</a> @ <a href="http://shepherd-interactive.com/">Shepherd Interactive</a></address>
-		2009-07-24
+		$Date$
 	</footer>
 	
 	<!-- jQuery, Prototype, and Sizzle looked for in the case that document.querySelectorAll is not available;
