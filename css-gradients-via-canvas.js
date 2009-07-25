@@ -26,7 +26,7 @@ var cssGradientsViaCanvas = {
 	supportsDataURI: null,
 	supportsCanvas: null,
 	enabled: null,
-	proprietaryPropertyPrefixes: ['webkit', 'moz', 'o', 'ms'],
+	proprietaryPropertyPrefixes: ['webkit', 'moz', 'o', 'ms', 'khtml'],
 	oninit: function(){ //user-overridable initialization callback function
 		if(this.enabled)
 			document.documentElement.className += " css-gradients-via-canvas";
@@ -82,6 +82,8 @@ img.src = testDataURI;
 // and then apply those gradients to their selected elements.
 var initalized = false;
 function provideGradientsViaCanvas(evt){
+	if(config.enabled == false)
+		return;
 	if(evt && evt.type == 'DOMContentLoaded')
 		domLoaded = true;
 	
@@ -220,7 +222,7 @@ function provideGradientsViaCanvas(evt){
 		while(ruleMatch = reProperty.exec(sheetCssText)){
 			var selector = normalizeWhitespace(ruleMatch[1]);
 			var propertyName = ruleMatch[2];
-			var propertyValue = normalizeWhitespace(ruleMatch[3]).toLowerCase().replace(/\s*(,|:|\(\))\s*/g, '$1');
+			var propertyValue = normalizeWhitespace(ruleMatch[3]).toLowerCase().replace(/\s*(,|:|\(|\))\s*/g, '$1');
 			
 			var selectedElements = querySelectorAll(selector);
 			if(!selectedElements.length)
@@ -253,7 +255,7 @@ function provideGradientsViaCanvas(evt){
 				// 1.0), and a color (any valid CSS color). In addition the
 				// shorthand functions from and to are supported. These
 				// functions only require a color argument and are equivalent to
-				// color-stop(0, …) and color-stop(1.0, …) respectively.
+				// color-stop(0, ...) and color-stop(1.0, ...) respectively.
 				while(colorStopMatch = reColorStop.exec(propertyMatch[8])){
 					var stop;
 					var color;
@@ -278,7 +280,7 @@ function provideGradientsViaCanvas(evt){
 				(function(gradients){
 					// Provide a function on the selected element for refreshing
 					// the CSS gradient. This is also used for the initial paint.
-					el.refreshCssGradient = function(){
+					el.refreshCSSGradient = function(){
 						var canvas = config.createCanvas();
 						var computedStyle = document.defaultView.getComputedStyle(this, null);
 						canvas.width  = parseInt(computedStyle.width) + parseInt(computedStyle.paddingLeft) + parseInt(computedStyle.paddingRight);
@@ -324,7 +326,7 @@ function provideGradientsViaCanvas(evt){
 						//Apply the gradient to the selectedElement
 						this.style.backgroundImage = "url('" + canvas.toDataURL() + "')";
 					};
-					el.refreshCssGradient();
+					el.refreshCSSGradient();
 				})(gradients);
 			}); //end forEach(selectedElements... 
 		} //end while(ruleMatch = reProperty.exec(sheetCssText))
@@ -338,5 +340,6 @@ function provideGradientsViaCanvas(evt){
 } //end function provideGradientsViaCanvas
 if(document.addEventListener)
 	document.addEventListener('DOMContentLoaded', provideGradientsViaCanvas, false);
+
 
 })();
