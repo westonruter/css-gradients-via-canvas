@@ -20,25 +20,30 @@
  * $Id$
  */
 
+if(!window.console){
+	console = {
+		info:function(x){alert(x)}
+	}
+}
+
 var cssGradientsViaCanvas = {
 	hasNativeSupport: null,
 	supportsDataURI: null
 };
 
 (function(){
-
 //Check to see if CSS Gradients are natively supported
 var testGradient = "linear, 0% 0%, 0% 100%, from(#000), to(#fff)";
 var div = document.createElement('div');
-div.style.cssText = 'background:gradient("' + testGradient + '");';
-if(div.style.cssText.indexOf('gradient') != -1){
+div.style.cssText = 'background-image:gradient("' + testGradient + '");';
+if(div.style.backgroundImage){
 	cssGradientsViaCanvas.hasNativeSupport = true;
 	return;
 }
 var prefixes = ['webkit', 'moz', 'o', 'ms'];
 for(var i = 0; i < prefixes.length; i++){
-	div.style.cssText = 'background:-' + prefixes[i] + '-gradient(' + testGradient + ');';
-	if(div.style.cssText.indexOf('gradient') != -1){
+	div.style.cssText = 'background-image:-' + prefixes[i] + '-gradient(' + testGradient + ');';
+	if(div.style.backgroundImage){
 		cssGradientsViaCanvas.hasNativeSupport = true;
 		return;
 	}
@@ -85,7 +90,7 @@ function provideGradientsViaCanvas(evt){
 		if(window.console && console.info)
 			console.info('This browser does not support data: URIs, therefore CSS Gradients via Canvas will not work.');
 		return;
-	}	
+	}
 
 	//Get implementation of XMLHttpRequest, from: http://en.wikipedia.org/wiki/XMLHttpRequest
 	if (typeof(XMLHttpRequest) == "undefined") {
@@ -247,57 +252,61 @@ function provideGradientsViaCanvas(evt){
 
 			//Iterate over all of the selected elements and apply the gradients to each
 			forEach(selectedElements, function(el){
-				var canvas = document.createElement('canvas');
-				
-				//Browser that supports canvas
-				var computedStyle = document.defaultView.getComputedStyle(el,null);
-				canvas.width  = parseInt(computedStyle.width) + parseInt(computedStyle.paddingLeft) + parseInt(computedStyle.paddingRight);
-				canvas.height = parseInt(computedStyle.height) + parseInt(computedStyle.paddingTop) + parseInt(computedStyle.paddingBottom);
-				var ctx = canvas.getContext('2d');
-				
-				//Iterate over the gradients and build them up
-				forEach(gradients, function(gradient){
-					var canvasGradient;
-					
-					// Linear gradient
-					if(gradient.type == 'linear'){
-						canvasGradient = ctx.createLinearGradient(
-							parseCoordinate(gradient.x0, canvas.width),
-							parseCoordinate(gradient.y0, canvas.height),
-							parseCoordinate(gradient.x1, canvas.width),
-							parseCoordinate(gradient.y1, canvas.height)
-						);
-					}
-					// Radial gradient
-					else /*if(gradient.type == 'radial')*/ {
-						canvasGradient = ctx.createRadialGradient(
-							parseCoordinate(gradient.x0, canvas.width),
-							parseCoordinate(gradient.y0, canvas.height),
-							gradient.r0,
-							parseCoordinate(gradient.x1, canvas.width),
-							parseCoordinate(gradient.y1, canvas.height),
-							gradient.r1
-						);
-					}
-					
-					//Add each of the color stops to the gradient
-					forEach(gradient.colorStops, function(cs){
-						canvasGradient.addColorStop(cs.stop, cs.color);
-					});
-					ctx.fillStyle = canvasGradient;
-					ctx.fillRect(0,0,canvas.width,canvas.height);
-					
-				}); //end forEach(gradients
-				
-				//Apply the gradient to the selectedElement
-				el.style.backgroundImage = "url('" + canvas.toDataURL() + "')";
-
+				//(function(){
+					el.refreshCssGradient = function(){
+						var canvas = document.createElement('canvas');
+						var computedStyle = document.defaultView.getComputedStyle(this, null);
+						canvas.width  = parseInt(computedStyle.width) + parseInt(computedStyle.paddingLeft) + parseInt(computedStyle.paddingRight);
+						canvas.height = parseInt(computedStyle.height) + parseInt(computedStyle.paddingTop) + parseInt(computedStyle.paddingBottom);
+						var ctx = canvas.getContext('2d');
+						
+						//Iterate over the gradients and build them up
+						forEach(gradients, function(gradient){
+							var canvasGradient;
+							
+							// Linear gradient
+							if(gradient.type == 'linear'){
+								canvasGradient = ctx.createLinearGradient(
+									parseCoordinate(gradient.x0, canvas.width),
+									parseCoordinate(gradient.y0, canvas.height),
+									parseCoordinate(gradient.x1, canvas.width),
+									parseCoordinate(gradient.y1, canvas.height)
+								);
+							}
+							// Radial gradient
+							else /*if(gradient.type == 'radial')*/ {
+								canvasGradient = ctx.createRadialGradient(
+									parseCoordinate(gradient.x0, canvas.width),
+									parseCoordinate(gradient.y0, canvas.height),
+									gradient.r0,
+									parseCoordinate(gradient.x1, canvas.width),
+									parseCoordinate(gradient.y1, canvas.height),
+									gradient.r1
+								);
+							}
+							
+							//Add each of the color stops to the gradient
+							forEach(gradient.colorStops, function(cs){
+								canvasGradient.addColorStop(cs.stop, cs.color);
+							});
+							ctx.fillStyle = canvasGradient;
+							ctx.fillRect(0,0,canvas.width,canvas.height);
+							
+						}); //end forEach(gradients
+						
+						//Apply the gradient to the selectedElement
+						this.style.backgroundImage = "url('" + canvas.toDataURL() + "')";
+					};
+					el.refreshCssGradient();
+				//})();
 			}); //end forEach(selectedElements... 
 		} //end while(ruleMatch = reProperty.exec(sheetCssText))
 	}); //end forEach(document.styleSheets...
 	
 }
-if(document.addEventListener)
+if(document.addEventListener){
 	document.addEventListener('DOMContentLoaded', provideGradientsViaCanvas, false);
+	window.addEventListener('DOMContentLoaded', provideGradientsViaCanvas, false);
+}
 
 })();
