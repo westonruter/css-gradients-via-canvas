@@ -67,28 +67,28 @@ function provideGradientsViaCanvas(){
 	
 	//Get implementation of XMLHttpRequest, from: http://en.wikipedia.org/wiki/XMLHttpRequest
 	if (typeof(XMLHttpRequest) == "undefined") {
-	  XMLHttpRequest = function() {
-		try { return new ActiveXObject("Msxml2.XMLHTTP.6.0"); }
-		  catch(e) {}
-		try { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); }
-		  catch(e) {}
-		try { return new ActiveXObject("Msxml2.XMLHTTP"); }
-		  catch(e) {}
-		try { return new ActiveXObject("Microsoft.XMLHTTP"); }
-		  catch(e) {}
-		throw new Error("This browser does not support XMLHttpRequest.");
-	  };
+		XMLHttpRequest = function() {
+			try { return new ActiveXObject("Msxml2.XMLHTTP.6.0"); }
+				catch(e) {}
+			try { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); }
+				catch(e) {}
+			try { return new ActiveXObject("Msxml2.XMLHTTP"); }
+				catch(e) {}
+			try { return new ActiveXObject("Microsoft.XMLHTTP"); }
+				catch(e) {}
+			throw new Error("This browser does not support XMLHttpRequest.");
+		};
 	}
 	
 	//Remove all comments and whitespace from a string
 	function normalizeWhitespace(str){
 		str = str.replace(/\/\*(.|\s)*?\*\//, ''); //Remove comments
-		str = str.replace(/\s+/g, ' ').replace(/^ | $/g, ''); //Normalize whitespace
+		str = str.replace(/\s+/g, ' ').replace(/^ | $/g, ''); //Trim whitespace
 		return str;
 	}
 	
 	//Get the best-available querySelectorAll 
-	var querySelectorAll = function(selector){
+	function querySelectorAll(selector){
 		if(document.querySelectorAll)
 			return document.querySelectorAll(selector);
 		else if(window.jQuery)
@@ -117,7 +117,7 @@ function provideGradientsViaCanvas(){
 		
 		//Convert percentage
 		if(value.indexOf('%') != -1)
-			value = parseFloat(value.substr(0, value.length-1))/100;
+			value = parseFloat(value.substr(0, value.length-1))/100*max;
 		//Convert bare number (a pixel value)
 		else 
 			value = parseFloat(value);
@@ -131,16 +131,15 @@ function provideGradientsViaCanvas(){
 	
 	//Parse the stylesheets for CSS Gradients
 	var reProperty = /([^}]+){[^}]*?((?=(?:-\w+-)?gradient)[^;]+)/g;
-	//var reGradient = /gradient\s*\(\s*(radial|linear)\s*,\s*([^,]+)\s+([^,]+)(?:\s*,\s*([^,]+))?\s*,\s*([^,]+)\s+([^,])(?:\s*,\s*([^,]+))?\s*(.+?)\)(?=\s*$|\s*,\s*(?:-\w+-)?gradient)/g; //don't look at this regular expression :-)
 	var reGradient = /gradient\((radial|linear),(\S+) ([^,]+)(?:,(\d+\.?\d*))?,(\S+) ([^,]+)(?:,(\d+\.?\d*))?,(.+?)\)(?=\s*$|\s*,\s*(?:-\w+-)?gradient)/g; //don't look at this regular expression :-)
-	var reColorStop = /(?:(from|to)\((\w+\(.+?\)|.+?)\)|color-stop\((\d+\.?\d*)(%)?,(\w+\(.+?\)|.+?)\))(?=,|$)/g;
+	var reColorStop = /(?:(from|to)\((\w+\(.+?\)|.+?)\)|color-stop\((\d*\.?\d*)(%)?,(\w+\(.+?\)|.+?)\))(?=,|$)/g;
 	for(var i = 0; i < document.styleSheets.length; i++){
 		var stylesheet = document.styleSheets[i];
 		
 		// Only do this for screen media
-		//var media = stylesheet.media.item ? stylesheet.media.item(i) : stylesheet.media;
-		//if(media && media != 'screen' && media != 'all')
-		//	break;
+		var media = stylesheet.media.item ? stylesheet.media.item(i) : stylesheet.media;
+		if(media && media != 'screen' && media != 'all')
+			continue;
 		
 		// We actually have to load the stylesheet in via XHR (inspired by
 		// moofx); but this should be OK performance-wise if things are cached
@@ -170,101 +169,168 @@ function provideGradientsViaCanvas(){
 			if(!selectedElements.length)
 				continue;
 			
-			while(propertyMatch = reGradient.exec(propertyValue)){
-				//gradient(linear, <point>, <point> [, <stop>]*)
-				//gradient(radial, <point> , <radius>, <point>, <radius> [, <stop>]*)
-				var type = propertyMatch[1], //The type of a gradient is either linear or radial.
-				    x0 = propertyMatch[2],
-				    y0 = propertyMatch[3],
-				    r0 = parseFloat(propertyMatch[4]),
-				    x1 = propertyMatch[5],
-				    y1 = propertyMatch[6],
-				    r1 = parseFloat(propertyMatch[7]),
-				    colorStops = [];
+			//Canvas is not supported, so attempt to get the gradient from the server
+			if(!document.createElement('canvas').getContext){
+				throw Error("ISSUE! We need to store not only the selector but also the element index that the generated data URI applies to");
 				
-				//If x0 = x1 and y0 = y1, then the linear gradient must paint nothing.
-				if(type == 'linear' && x0 == x2 && y0 == y1)
-					break;
 				
-				// A stop is a function, color-stop, that takes two arguments,
-				// the stop value (either a percentage or a number between 0 and
-				// 1.0), and a color (any valid CSS color). In addition the
-				// shorthand functions from and to are supported. These
-				// functions only require a color argument and are equivalent to
-				// color-stop(0, …) and color-stop(1.0, …) respectively.
-				while(colorStopMatch = reColorStop.exec(propertyMatch[8])){
-					var stop;
-					var color;
-					if(colorStopMatch[1]){
-						stop = colorStopMatch[1] == 'from' ? 0.0 : 1.0;
-						color = colorStopMatch[2];
+				if(cssGradientsViaCanvas.supportsDataURI){
+					
+					//Use the 
+					if(window.sessionStorage && sessionStorage.cssGradientsViaCanvas && sessionStorage.cssGradientsViaCanvas[selector]){
+						
 					}
 					else {
-						stop = parseFloat(colorStopMatch[3]);
-						if(colorStopMatch[4]) //percentage
-							stop /= 100;
-						color = colorStopMatch[5];
+						var xhr = new XMLHttpRequest();
+						var url = cssGradientsViaCanvas.gradientCacheScript + "?selector="+encodeURIComponent(selector);
+						if(cssGradientsViaCanvas.supportsDataURI)
+							url += "&data-uri=on";
+							
+						xhr.open('GET', url);
+						xhr.onreadystatechange = function(){
+							if(xhr.readyState == 4 && xhr.status == 200){
+								for(var i = 0; i < selectedElements.length; i++){
+									if(window.sessionStorage){
+										if(!sessionStorage.cssGradientsViaCanvas)
+											sessionStorage.cssGradientsViaCanvas = {}
+										sessionStorage.cssGradientsViaCanvas[selector] = xhr.responseText;
+									}
+									selectedElements[i].style.backgroundImage = 'url("' + xhr.responseText + '")';
+								}
+							}
+						};
+						xhr.send(null);
 					}
-					colorStops.push({stop:stop, color:color});
+					
+					//We should store the result in sessionStorage to avoid recurrant lookups
+					
 				}
-				
-				if(type == 'radial'){
-					if(window.console && console.warn)
-						console.warn('radial CSS gradients are not yet supported: ' + propertyMatch[0]);
-					continue;
+				//Link to the gradient images directly
+				else {
+					for(var i = 0; i < selectedElements.length; i++){
+						selectedElements[i].style.backgroundImage = 'url("' + cssGradientsViaCanvas.gradientCacheScript + "?selector="+encodeURIComponent(selector)  + '")';
+					}
 				}
+			}
+			//Parse all of the gradients out of the property
+			else {
+				var gradients = [];
 				
+				while(propertyMatch = reGradient.exec(propertyValue)){
+					//gradient(linear, <point>, <point> [, <stop>]*)
+					//gradient(radial, <point> , <radius>, <point>, <radius> [, <stop>]*)
+					
+					var gradient = {
+						type: propertyMatch[1],
+						x0: propertyMatch[2],
+						y0: propertyMatch[3],
+						r0: parseFloat(propertyMatch[4]),
+						x1: propertyMatch[5],
+						y1: propertyMatch[6],
+						r1: parseFloat(propertyMatch[7]),
+						colorStops: []
+					}
+					
+					//If x0 = x1 and y0 = y1, then the linear gradient must paint nothing.
+					if(gradient.type == 'linear' && gradient.x0 == gradient.x2 && gradient.y0 == gradient.y1)
+						continue;
+					
+					// A stop is a function, color-stop, that takes two arguments,
+					// the stop value (either a percentage or a number between 0 and
+					// 1.0), and a color (any valid CSS color). In addition the
+					// shorthand functions from and to are supported. These
+					// functions only require a color argument and are equivalent to
+					// color-stop(0, …) and color-stop(1.0, …) respectively.
+					while(colorStopMatch = reColorStop.exec(propertyMatch[8])){
+						var stop;
+						var color;
+						if(colorStopMatch[1]){
+							stop = colorStopMatch[1] == 'from' ? 0.0 : 1.0;
+							color = colorStopMatch[2];
+						}
+						else {
+							stop = parseFloat(colorStopMatch[3]);
+							if(colorStopMatch[4]) //percentage
+								stop /= 100;
+							color = colorStopMatch[5];
+						}
+						gradient.colorStops.push({stop:stop, color:color});
+					}
+					
+					if(gradient.type == 'radial'){
+						//if(window.console && console.warn)
+							//console.warn('radial CSS gradients are not yet supported: ' + propertyMatch[0]);
+					}
+					
+					//if(type == 'radial')
+					//	console.info(
+					//		[x0,
+					//		y0,
+					//		r0,
+					//		x1,
+					//		y1,
+					//		r1, colorStops]
+					//	);
+					gradients.push(gradient);
+					
+				} //end while(propertyMatch = reGradient.exec(propertyValue))
 				
+				console.info(gradients)
+
 				//Iterate over all of the selected elements and apply the gradients to each
 				for(var j = 0; j < selectedElements.length; j++){
 					var el = selectedElements[j];
-					console.info(el)
-				
-					console.info(
-						[x0,
-						y0,
-						r0,
-						x1,
-						y1,
-						r1, colorStops]
-					)
 					var canvas = document.createElement('canvas');
 					
 					//Browser that supports canvas
-					if(canvas.getContext){
-						var computedStyle = document.defaultView.getComputedStyle(el,null);
-						canvas.width  = parseInt(computedStyle.width) + parseInt(computedStyle.paddingLeft) + parseInt(computedStyle.paddingRight);
-						canvas.height = parseInt(computedStyle.height) + parseInt(computedStyle.paddingTop) + parseInt(computedStyle.paddingBottom);
-						console.info(canvas.width)
-						console.info(canvas.height)
-						
-						var _x0 = parseCoordinate(x0, canvas.width),
-						    _y0 = parseCoordinate(y0, canvas.height),
-						    _x1 = parseCoordinate(x1, canvas.width),
-						    _y1 = parseCoordinate(y1, canvas.height);
-						
-						var ctx = canvas.getContext('2d');
-						
-						console.info([_x0,_y0,_x1,_y1])
-						var gradient = ctx.createLinearGradient(_x0,_y0,_x1,_y1);
-						for(var k = 0; k < colorStops.length; k++)
-							gradient.addColorStop(colorStops[k].stop, colorStops[k].color);
-						
-						ctx.fillStyle = gradient;
-						ctx.fillRect(0,0,canvas.width,canvas.height);
-						el.style.backgroundImage = "url('" + canvas.toDataURL() + "')";
-						//if(x1 == x2)
-						//	target.style.backgroundRepeat = 'repeat-x';
-						//else if(y1 == y2)
-						//	target.style.backgroundRepeat = 'repeat-y';
+					var computedStyle = document.defaultView.getComputedStyle(el,null);
+					canvas.width  = parseInt(computedStyle.width) + parseInt(computedStyle.paddingLeft) + parseInt(computedStyle.paddingRight);
+					canvas.height = parseInt(computedStyle.height) + parseInt(computedStyle.paddingTop) + parseInt(computedStyle.paddingBottom);
+					var ctx = canvas.getContext('2d');
+					
+					//Iterate over the gradients and build them up
+					for(var k = 0; k < gradients.length; k++){
+						// Linear gradient
+						if(gradients[k].type == 'linear'){
+							var linearGradient = ctx.createLinearGradient(
+												parseCoordinate(gradients[k].x0, canvas.width),
+												parseCoordinate(gradients[k].y0, canvas.height),
+												parseCoordinate(gradients[k].x1, canvas.width),
+												parseCoordinate(gradients[k].y1, canvas.height)
+											);
+							
+							//Add each of the color stops to the gradient
+							for(var l = 0; l < gradients[k].colorStops.length; l++)
+								linearGradient.addColorStop(gradients[k].colorStops[l].stop, gradients[k].colorStops[l].color);
+							
+							ctx.fillStyle = linearGradient;
+							ctx.fillRect(0,0,canvas.width,canvas.height);
+						}
+						// Radial gradient
+						else if(gradients[k].type == 'radial'){
+							
+						}
 					}
-				}
-				
-				
+					
+					var dataURI = canvas.toDataURL();
+					el.style.backgroundImage = "url('" + dataURI + "')";
+					
+					//Send the gradient to be cached on the server
+					if(cssGradientsViaCanvas.gradientCacheScript){
+						console.info('SEND: ' + selector)
+						var xhr = new XMLHttpRequest();
+						xhr.open('POST', cssGradientsViaCanvas.gradientCacheScript);
+						xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded');
+						xhr.send([
+							'selector=' + encodeURIComponent(selector),
+							'gradient=' + encodeURIComponent(dataURI)
+						].join('&'));
+					}
 
+				} //end for each selectedElements
 				
-			}
-			
+				
+			} //end if canvas supported
 			
 			
 			
