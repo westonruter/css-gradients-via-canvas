@@ -8,6 +8,9 @@
 	p {
 		line-height:1.2em;
 	}
+	dt {
+		font-weight:bold;
+	}
 	</style>
 </head>
 <body>
@@ -55,16 +58,24 @@
 	Toggling an element's class name by scripting is how you can assure that its style will be changed before calling <code>refreshCSSGradient()</code>. The
 	<a href="#linear2">last example</a> below demonstrates this.</p>
 	
+	<h3 id="changelog">Changelog</h3>
+	<dl>
+		<dt>1.0.2 (<time>2009-08-05</time>): </dt>
+		<dd>Now requiring that <code>gradient(…)</code> only be used with the <code>background-image</code> property instead
+		of with the <code>background</code> shorthand properties since the additional <code>background-*</code> properties are not parsed out.</dd>
+	</dl>
+	
 	<div id="examples">
 	<h3>Examples</h3>
 	<style scoped="scoped">
 	#linear1 { width:150px; height:150px; border:2px solid black; /*padding: 10px; */
-		   background:-webkit-gradient(linear, left top, left bottom, from(#00abeb), to(#fff), color-stop(0.5, #fff), color-stop(0.5, #66cc00)) !important;
+		   background-image:-webkit-gradient(linear, left top, left bottom, from(#00abeb), to(#fff), color-stop(0.5, #fff), color-stop(0.5, #66cc00)) !important;
 		   /*-webkit-background-origin: padding-box; -webkit-background-clip: content-box;*/ }
 	
 	#linear2 {
 			border:2px solid black;
 			width:150px; height:150px;
+			/*Note: Only use gradients background-image, not background shortcut property. */
 			background-image: -webkit-gradient(linear, 0% 25%, 75% 100%,
 									 from(red),
 									 to(purple),
@@ -76,7 +87,8 @@
 	}
 	
 	#radial1 { width:150px; height:150px; border:2px solid black;
-		   background: -webkit-gradient(radial, 45 45, 10, 52 50, 30, from(#A7D30C), to(rgba(1,159,98,0)), color-stop(90%, #019F62)),
+	       /*Note: Only use gradients background-image, not background shortcut property. */
+		   background-image: -webkit-gradient(radial, 45 45, 10, 52 50, 30, from(#A7D30C), to(rgba(1,159,98,0)), color-stop(90%, #019F62)),
 					   -webkit-gradient(radial, 105 105, 20, 112 120, 50, from(#ff5f98), to(rgba(255,1,136,0)), color-stop(75%, #ff0188)),
 					   -webkit-gradient(radial, 95 15, 15, 102 20, 40, from(#00c9ff), to(rgba(0,201,255,0)), color-stop(80%, #00b5e2)),
 					   -webkit-gradient(radial, 0 150, 50, 0 140, 90, from(#f4f201), to(rgba(228, 199,0,0)), color-stop(80%, #e4c700)); }
