@@ -35,7 +35,9 @@
 	The script employs <a href="https://developer.mozilla.org/En/DOM/Document.querySelectorAll"><code>document.querySelectorAll()</code></a>—it has no external dependencies
 	if this function is implemented; otherwise, it looks for the presence of jQuery, Prototype, or Sizzle to provide selector-querying functionality.</p>
 	
-	<p id="browser-support">The implementation works in Firefox 2/3+ and Opera 9.64 (at least). Safari and Chrome have native support for CSS Gradients since they use WebKit, as already mentiond.
+	<p id="browser-support">The implementation works in Firefox 2/3+ and Opera 9.64 (at least). Safari and Chrome have native support for CSS Gradients since they use WebKit, as already mentioned.
+	Beginning with version 3.6, CSS Gradients are also <a href="https://developer.mozilla.org/en/CSS/Gradients" title="CSS Gradients @ Mozilla Developer Center">natively supported</a> by Firefox and this implementation
+	will defer in such case; note that you will need to specify two separate <code>background</code> CSS properties, one with <code>-webkit-gradient</code> and another with <code>-moz-linear/radial-gradient</code> which has a <em>different syntax</em>).
 	This implementation does <em>not</em> work in Internet Explorer since IE does not support Canvas, although IE8 does support the <code>data:</code> URI scheme, which is a prerequisite
 	(see <a href="http://weston.ruter.net/2009/05/07/detecting-support-for-data-uris/" title="Detecting Support for data: URIs">support detection method</a>).
 	When/if Gears's <a href="http://code.google.com/apis/gears/api_canvas.html">Canvas API</a> fully implements the HTML5 canvas specification, then this implementation
@@ -60,9 +62,11 @@
 	
 	<h3 id="changelog">Changelog</h3>
 	<dl>
+		<dt>1.0.3 (<time>2009-08-10</time>): </dt>
+		<dd><p>Detecting support for native support for CSS Gradients in Firefox 3.6.</p></dd>
 		<dt>1.0.2 (<time>2009-08-05</time>): </dt>
-		<dd>Now requiring that <code>gradient(…)</code> only be used with the <code>background-image</code> property instead
-		of with the <code>background</code> shorthand properties since the additional <code>background-*</code> properties are not parsed out.</dd>
+		<dd><p>Now requiring that <code>gradient(…)</code> only be used with the <code>background-image</code> property instead
+		of with the <code>background</code> shorthand properties since the additional <code>background-*</code> properties are not parsed out.</p></dd>
 	</dl>
 	
 	<div id="examples">
@@ -70,6 +74,7 @@
 	<style scoped="scoped">
 	#linear1 { width:150px; height:150px; border:2px solid black; /*padding: 10px; */
 		   background-image:-webkit-gradient(linear, left top, left bottom, from(#00abeb), to(#fff), color-stop(0.5, #fff), color-stop(0.5, #66cc00)) !important;
+		   background-image:-moz-linear-gradient(left top, left bottom, from(#00abeb), to(#fff), color-stop(0.5, #fff), color-stop(0.5, #66cc00)) !important;
 		   /*-webkit-background-origin: padding-box; -webkit-background-clip: content-box;*/ }
 	
 	#linear2 {
@@ -83,6 +88,14 @@
 									 color-stop(.4, yellow),
 									 color-stop(.6, green),
 									 color-stop(.8, blue));
+			background-image: -moz-linear-gradient(0% 25%, 75% 100%,
+									 from(red),
+									 to(purple),
+									 color-stop(.2, orange),
+									 color-stop(.4, yellow),
+									 color-stop(.6, green),
+									 color-stop(.8, blue));
+			background-repeat:no-repeat;
 	
 	}
 	
@@ -91,7 +104,16 @@
 		   background-image: -webkit-gradient(radial, 45 45, 10, 52 50, 30, from(#A7D30C), to(rgba(1,159,98,0)), color-stop(90%, #019F62)),
 					   -webkit-gradient(radial, 105 105, 20, 112 120, 50, from(#ff5f98), to(rgba(255,1,136,0)), color-stop(75%, #ff0188)),
 					   -webkit-gradient(radial, 95 15, 15, 102 20, 40, from(#00c9ff), to(rgba(0,201,255,0)), color-stop(80%, #00b5e2)),
-					   -webkit-gradient(radial, 0 150, 50, 0 140, 90, from(#f4f201), to(rgba(228, 199,0,0)), color-stop(80%, #e4c700)); }
+					   -webkit-gradient(radial, 0 150, 50, 0 140, 90, from(#f4f201), to(rgba(228, 199,0,0)), color-stop(80%, #e4c700));
+		
+		   background-image: -moz-radial-gradient(45px 45px, 10px, 52px 50px, 30px, from(#A7D30C), to(rgba(1,159,98,0)), color-stop(90%, #019F62)),
+					   -moz-radial-gradient(105px 105px, 20px, 112px 120px, 50px, from(#ff5f98), to(rgba(255,1,136,0)), color-stop(75%, #ff0188)),
+					   -moz-radial-gradient(95px 15px, 15px, 102px 20px, 40px, from(#00c9ff), to(rgba(0,201,255,0)), color-stop(80%, #00b5e2)),
+					   -moz-radial-gradient(0px 150px, 50px, 0px 140px, 90px, from(#f4f201), to(rgba(228, 199,0,0)), color-stop(80%, #e4c700));
+			
+			/*background-image:-moz-radial-gradient(45px 45px, 10px, 45px 45px, 30px, from(#ff0000), to(#0000ff));*/
+			background-repeat:no-repeat;
+	}
 	
 	
 	/* Play around with some interactivity; requires manual mouseover/mouseout
@@ -176,7 +198,7 @@
 	<hr />
 	<footer>
 		<address><a href="http://weston.ruter.net/" rel="author">Weston Ruter</a> @ <a href="http://shepherd-interactive.com/">Shepherd Interactive</a></address>
-		2009-07-25
+		2009-08-10
 	</footer>
 </body>
 </html>

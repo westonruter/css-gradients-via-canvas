@@ -1,5 +1,5 @@
 /* 
- * CSS Gradients via Canvas v1.0.2 <http://weston.ruter.net/projects/css-gradients-via-canvas/>
+ * CSS Gradients via Canvas v1.0.3 <http://weston.ruter.net/projects/css-gradients-via-canvas/>
  *  by Weston Ruter, Shepherd Interactive <http://www.shepherd-interactive.com/>
  *  Latest: http://shepherd-interactive.googlecode.com/svn/trunk/css-gradients-via-canvas/css-gradients-via-canvas.js
  * 
@@ -26,7 +26,7 @@ var cssGradientsViaCanvas = {
 	supportsDataURI: null,
 	supportsCanvas: null,
 	enabled: null,
-	proprietaryPropertyPrefixes: ['webkit', 'moz', 'o', 'ms', 'khtml'],
+	//proprietaryPropertyPrefixes: ['webkit', 'moz', 'o', 'ms', 'khtml'],
 	oninit: function(){ //user-overridable initialization callback function
 		if(this.enabled)
 			document.documentElement.className += " css-gradients-via-canvas";
@@ -44,25 +44,17 @@ var cssGradientsViaCanvas = {
 var config = cssGradientsViaCanvas;
 
 //Check to see if CSS Gradients are natively supported
-var testGradient = "linear, 0% 0%, 0% 100%, from(#000), to(#fff)";
 var div = document.createElement('div');
-div.style.cssText = 'background-image:gradient("' + testGradient + '");';
+div.style.cssText = [
+	"background-image:-webkit-gradient(linear, 0% 0%, 0% 100%, from(red), to(blue));",
+	"background-image:-moz-linear-gradient(top left, bottom right, from(red), to(blue));"
+].join('');
 if(div.style.backgroundImage){
 	config.enabled = false;
 	config.hasNativeSupport = true;
 	if(config.oninit)
 		config.oninit();
 	return;
-}
-for(var i = 0; i < config.proprietaryPropertyPrefixes.length; i++){
-	div.style.cssText = 'background-image:-' + config.proprietaryPropertyPrefixes[i] + '-gradient(' + testGradient + ');';
-	if(div.style.backgroundImage){
-		config.enabled = false;
-		config.hasNativeSupport = true;
-		if(config.oninit)
-			config.oninit();
-		return;
-	}
 }
 config.hasNativeSupport = false;
 
