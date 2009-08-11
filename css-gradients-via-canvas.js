@@ -1,5 +1,5 @@
 /* 
- * CSS Gradients via Canvas v1.0.3 <http://weston.ruter.net/projects/css-gradients-via-canvas/>
+ * CSS Gradients via Canvas v1.0.4 <http://weston.ruter.net/projects/css-gradients-via-canvas/>
  *  by Weston Ruter, Shepherd Interactive <http://www.shepherd-interactive.com/>
  *  Latest: http://shepherd-interactive.googlecode.com/svn/trunk/css-gradients-via-canvas/css-gradients-via-canvas.js
  * 
@@ -179,13 +179,13 @@ function provideGradientsViaCanvas(evt){
 	
 	
 	//Parse the stylesheets for CSS Gradients
-	var reProperty = /([^}]+){[^}]*?([a-z\-]*background-image*)\s*:\s*((?:-\w+-)?gradient[^;]+)/g; //([a-z\-]*background[a-z\-]*):
+	var reProperty = /([^}]+){[^}]*?([a-z\-]*background-image*)\s*:\s*(-webkit-gradient[^;]+)/g; //([a-z\-]*background[a-z\-]*):
 	var reGradient = /gradient\((radial|linear),(\S+) ([^,]+)(?:,(\d+\.?\d*))?,(\S+) ([^,]+)(?:,(\d+\.?\d*))?,(.+?)\)(?=\s*(?:!important\s*)?$|\s*,\s*(?:-\w+-)?gradient)/g; //don't look at this regular expression :-)
 	var reColorStop = /(?:(from|to)\((\w+\(.+?\)|.+?)\)|color-stop\((\d*\.?\d*)(%)?,(\w+\(.+?\)|.+?)\))(?=,|$)/g;
 	
 	forEach(document.styleSheets, function(stylesheet){
 		// Only do this for screen media
-		var media = stylesheet.media.item ? stylesheet.media.item(i) : stylesheet.media;
+		var media = stylesheet.media.item ? stylesheet.media.item(0) : stylesheet.media;
 		if(media && media != 'screen' && media != 'all')
 			return;
 		
