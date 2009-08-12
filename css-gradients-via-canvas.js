@@ -1,5 +1,5 @@
 /* 
- * CSS Gradients via Canvas v1.0.4 <http://weston.ruter.net/projects/css-gradients-via-canvas/>
+ * CSS Gradients via Canvas v1.1 <http://weston.ruter.net/projects/css-gradients-via-canvas/>
  *  by Weston Ruter, Shepherd Interactive <http://www.shepherd-interactive.com/>
  *  Latest: http://shepherd-interactive.googlecode.com/svn/trunk/css-gradients-via-canvas/css-gradients-via-canvas.js
  * 
@@ -22,8 +22,9 @@
  */
 
 var cssGradientsViaCanvas = {
+	useCache:false, // set to true to utilize sessionStorage to remember the CSS rules containing
+	                // gradients, so that they don't have to be parsed out of the stylesheets each time
 	hasNativeSupport: null,
-	supportsDataURI: null,
 	supportsCanvas: null,
 	enabled: null,
 	//proprietaryPropertyPrefixes: ['webkit', 'moz', 'o', 'ms', 'khtml'],
@@ -59,15 +60,117 @@ if(div.style.backgroundImage){
 config.hasNativeSupport = false;
 
 var domLoaded = false;
+	
+//Die for loops, die!
+var forEach = Array.forEach || function(object, block, context) {
+	for (var i = 0; i < object.length; i++) {
+		block.call(context, object[i], i, object);
+	}
+};
 
-//Detect support for data: URI; see: http://weston.ruter.net/2009/05/07/detecting-support-for-data-uris/
-var testDataURI = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-var img = new Image();
-img.onload = img.onerror = function(){
-	config.supportsDataURI = (this.width == 1 && this.height == 1);
-	provideGradientsViaCanvas();
+//Get the best-available querySelectorAll 
+function querySelectorAll(selector){
+	if(document.querySelectorAll)
+		return document.querySelectorAll(selector);
+	else if(window.jQuery)
+		return jQuery(selector).get();
+	else if(window.Sizzle)
+		return Sizzle(selector);
+	else if(window.Prototype && window.$$)
+		return $$(selector);
+	else
+		throw Error("Neither document.querySelectorAll, jQuery, nor Prototype are available.");
+};
+
+//"A point is a pair of space-separated values. The syntax supports numbers,
+//percentages or the keywords top, bottom, left and right for point values."
+//This keywords and percentages into pixel equivalents
+function parseCoordinate(value, max){
+	//Convert keywords
+	switch(value){
+		case 'top':
+		case 'left':
+			return 0;
+		case 'bottom':
+		case 'right':
+			return max;
+		case 'center':
+			return max/2;
+	}
+	
+	//Convert percentage
+	if(value.indexOf('%') != -1)
+		value = parseFloat(value.substr(0, value.length-1))/100*max;
+	//Convert bare number (a pixel value)
+	else 
+		value = parseFloat(value);
+	if(isNaN(value))
+		throw Error("Unable to parse coordinate: " + value);
+	return value;
 }
-img.src = testDataURI;
+
+/**
+ * Apply a set of gradients to a given selector
+ */
+function applyGradients(selector, gradients){
+	var selectedElements = querySelectorAll(selector);
+	if(!selectedElements.length)
+		return;
+	
+	//Iterate over all of the selected elements and apply the gradients to each
+	forEach(selectedElements, function(el){
+		// Provide a function on the selected element for refreshing
+		// the CSS gradient. This is also used for the initial paint.
+		el.refreshCSSGradient = function(){
+			var canvas = config.createCanvas();
+			var computedStyle = document.defaultView.getComputedStyle(this, null);
+			canvas.width  = parseInt(computedStyle.width) + parseInt(computedStyle.paddingLeft) + parseInt(computedStyle.paddingRight);
+			canvas.height = parseInt(computedStyle.height) + parseInt(computedStyle.paddingTop) + parseInt(computedStyle.paddingBottom);
+			var ctx = canvas.getContext('2d');
+			
+			//Iterate over the gradients and build them up
+			forEach(gradients, function(gradient){
+				var canvasGradient;
+				
+				// Linear gradient
+				if(gradient.type == 'linear'){
+					canvasGradient = ctx.createLinearGradient(
+						parseCoordinate(gradient.x0, canvas.width),
+						parseCoordinate(gradient.y0, canvas.height),
+						parseCoordinate(gradient.x1, canvas.width),
+						parseCoordinate(gradient.y1, canvas.height)
+					);
+				}
+				// Radial gradient
+				else /*if(gradient.type == 'radial')*/ {
+					canvasGradient = ctx.createRadialGradient(
+						parseCoordinate(gradient.x0, canvas.width),
+						parseCoordinate(gradient.y0, canvas.height),
+						gradient.r0,
+						parseCoordinate(gradient.x1, canvas.width),
+						parseCoordinate(gradient.y1, canvas.height),
+						gradient.r1
+					);
+				}
+				
+				//Add each of the color stops to the gradient
+				forEach(gradient.colorStops, function(cs){
+					canvasGradient.addColorStop(cs.stop, cs.color);
+				});
+				
+				//Paint the gradient
+				ctx.fillStyle = canvasGradient;
+				ctx.fillRect(0,0,canvas.width,canvas.height);
+				
+			}); //end forEach(gradients
+			
+			//Apply the gradient to the selectedElement
+			this.style.backgroundImage = "url('" + canvas.toDataURL() + "')";
+		};
+		el.refreshCSSGradient();
+	}); //end forEach(selectedElements... 
+}
+
 
 
 // Once the page loads: search the stylesheets for instances of CSS gradients,
@@ -77,10 +180,9 @@ function provideGradientsViaCanvas(evt){
 	if(evt && evt.type == 'DOMContentLoaded')
 		domLoaded = true;
 	
-	// Don't run until the data: URI test above has been executed, or if this
-	// is not the result of DOMContentLoaded event, or if function has already
-	// been run in its entirety
-	if(config.supportsDataURI == null/*not checked yet*/ || !domLoaded || initalized)
+	// Don't run if this is not the result of DOMContentLoaded event, or if function
+	// has already been run in its entirety
+	if(!domLoaded || initalized)
 		return;
 	initalized = true;
 	
@@ -96,15 +198,22 @@ function provideGradientsViaCanvas(evt){
 		return;
 	}
 	
-	//Abort if data: URIs aren't supported
-	if(!config.supportsDataURI){
-		if(window.console && console.info)
-			console.info('This browser does not support data: URIs, therefore CSS Gradients via Canvas will not work.');
-		config.enabled = false;
-		if(config.oninit)
-			config.oninit();
-		return;
+	/**
+	 * Use the CSS Gradients that have been cached from previous runs
+	 */
+	if(config.useCache && window.sessionStorage && sessionStorage.cssGradientsViaCanvasCache && window.JSON && JSON.parse){
+		var cache = JSON.parse(sessionStorage.cssGradientsViaCanvasCache.toString());
+		if(cache){
+			forEach(cache, function(obj){
+				applyGradients(obj.selector, obj.gradients);
+			});
+			config.enabled = true;
+			if(config.oninit)
+				config.oninit();
+			return;
+		}
 	}
+
 
 	//Get implementation of XMLHttpRequest, from: http://en.wikipedia.org/wiki/XMLHttpRequest
 	if (typeof(XMLHttpRequest) == "undefined") {
@@ -129,59 +238,13 @@ function provideGradientsViaCanvas(evt){
 		return str;
 	}
 	
-	//Die for loops, die!
-	var forEach = Array.forEach || function(object, block, context) {
-		for (var i = 0; i < object.length; i++) {
-			block.call(context, object[i], i, object);
-		}
-	};
-	
-	//Get the best-available querySelectorAll 
-	function querySelectorAll(selector){
-		if(document.querySelectorAll)
-			return document.querySelectorAll(selector);
-		else if(window.jQuery)
-			return jQuery(selector).get();
-		else if(window.Sizzle)
-			return Sizzle(selector);
-		else if(window.Prototype && window.$$)
-			return $$(selector);
-		else
-			throw Error("Neither document.querySelectorAll, jQuery, nor Prototype are available.");
-	};
-	
-	//"A point is a pair of space-separated values. The syntax supports numbers,
-	//percentages or the keywords top, bottom, left and right for point values."
-	//This keywords and percentages into pixel equivalents
-	function parseCoordinate(value, max){
-		//Convert keywords
-		switch(value){
-			case 'top':
-			case 'left':
-				return 0;
-			case 'bottom':
-			case 'right':
-				return max;
-			case 'center':
-				return max/2;
-		}
-		
-		//Convert percentage
-		if(value.indexOf('%') != -1)
-			value = parseFloat(value.substr(0, value.length-1))/100*max;
-		//Convert bare number (a pixel value)
-		else 
-			value = parseFloat(value);
-		if(isNaN(value))
-			throw Error("Unable to parse coordinate: " + value);
-		return value;
-	}
-	
 	
 	//Parse the stylesheets for CSS Gradients
 	var reProperty = /([^}]+){[^}]*?([a-z\-]*background-image*)\s*:\s*(-webkit-gradient[^;]+)/g; //([a-z\-]*background[a-z\-]*):
 	var reGradient = /gradient\((radial|linear),(\S+) ([^,]+)(?:,(\d+\.?\d*))?,(\S+) ([^,]+)(?:,(\d+\.?\d*))?,(.+?)\)(?=\s*(?:!important\s*)?$|\s*,\s*(?:-\w+-)?gradient)/g; //don't look at this regular expression :-)
 	var reColorStop = /(?:(from|to)\((\w+\(.+?\)|.+?)\)|color-stop\((\d*\.?\d*)(%)?,(\w+\(.+?\)|.+?)\))(?=,|$)/g;
+	
+	var cache = [];
 	
 	forEach(document.styleSheets, function(stylesheet){
 		// Only do this for screen media
@@ -213,10 +276,6 @@ function provideGradientsViaCanvas(evt){
 			var selector = normalizeWhitespace(ruleMatch[1]);
 			var propertyName = ruleMatch[2];
 			var propertyValue = normalizeWhitespace(ruleMatch[3]).toLowerCase().replace(/\s*(,|:|\(|\))\s*/g, '$1');
-			
-			var selectedElements = querySelectorAll(selector);
-			if(!selectedElements.length)
-				continue;
 			
 			//Parse all of the gradients out of the property
 			var gradients = [];
@@ -264,63 +323,21 @@ function provideGradientsViaCanvas(evt){
 				gradients.unshift(gradient);
 				
 			} //end while(propertyMatch = reGradient.exec(propertyValue))
-
-			//Iterate over all of the selected elements and apply the gradients to each
-			forEach(selectedElements, function(el){
-				(function(gradients){
-					// Provide a function on the selected element for refreshing
-					// the CSS gradient. This is also used for the initial paint.
-					el.refreshCSSGradient = function(){
-						var canvas = config.createCanvas();
-						var computedStyle = document.defaultView.getComputedStyle(this, null);
-						canvas.width  = parseInt(computedStyle.width) + parseInt(computedStyle.paddingLeft) + parseInt(computedStyle.paddingRight);
-						canvas.height = parseInt(computedStyle.height) + parseInt(computedStyle.paddingTop) + parseInt(computedStyle.paddingBottom);
-						var ctx = canvas.getContext('2d');
-						
-						//Iterate over the gradients and build them up
-						forEach(gradients, function(gradient){
-							var canvasGradient;
-							
-							// Linear gradient
-							if(gradient.type == 'linear'){
-								canvasGradient = ctx.createLinearGradient(
-									parseCoordinate(gradient.x0, canvas.width),
-									parseCoordinate(gradient.y0, canvas.height),
-									parseCoordinate(gradient.x1, canvas.width),
-									parseCoordinate(gradient.y1, canvas.height)
-								);
-							}
-							// Radial gradient
-							else /*if(gradient.type == 'radial')*/ {
-								canvasGradient = ctx.createRadialGradient(
-									parseCoordinate(gradient.x0, canvas.width),
-									parseCoordinate(gradient.y0, canvas.height),
-									gradient.r0,
-									parseCoordinate(gradient.x1, canvas.width),
-									parseCoordinate(gradient.y1, canvas.height),
-									gradient.r1
-								);
-							}
-							
-							//Add each of the color stops to the gradient
-							forEach(gradient.colorStops, function(cs){
-								canvasGradient.addColorStop(cs.stop, cs.color);
-							});
-							
-							//Paint the gradient
-							ctx.fillStyle = canvasGradient;
-							ctx.fillRect(0,0,canvas.width,canvas.height);
-							
-						}); //end forEach(gradients
-						
-						//Apply the gradient to the selectedElement
-						this.style.backgroundImage = "url('" + canvas.toDataURL() + "')";
-					};
-					el.refreshCSSGradient();
-				})(gradients);
-			}); //end forEach(selectedElements... 
+			
+			//Push the cache
+			cache.push({
+				selector:selector,
+				gradients:gradients
+			});
+			
+			applyGradients(selector, gradients);
 		} //end while(ruleMatch = reProperty.exec(sheetCssText))
 	}); //end forEach(document.styleSheets...
+	
+	//Store the parsed CSS Gradients for faster recall next time a page is loaded
+	if(config.useCache && window.sessionStorage && window.JSON && JSON.stringify){
+		sessionStorage.cssGradientsViaCanvasCache = JSON.stringify(cache);
+	}
 	
 	//Success
 	config.enabled = true;
