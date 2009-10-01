@@ -1,5 +1,5 @@
 /* 
- * CSS Gradients via Canvas v1.1 <http://weston.ruter.net/projects/css-gradients-via-canvas/>
+ * CSS Gradients via Canvas v1.2 <http://weston.ruter.net/projects/css-gradients-via-canvas/>
  *  by Weston Ruter, Shepherd Interactive <http://www.shepherd-interactive.com/>
  *  Latest: http://shepherd-interactive.googlecode.com/svn/trunk/css-gradients-via-canvas/css-gradients-via-canvas.js
  * 
@@ -250,6 +250,10 @@ function provideGradientsViaCanvas(evt){
 		// Only do this for screen media
 		var media = stylesheet.media.item ? stylesheet.media.item(0) : stylesheet.media;
 		if(media && media != 'screen' && media != 'all')
+			return;
+		
+		// Ignore stylesheets that have class~=no-css-gradients
+		if(stylesheet.ownerNode && stylesheet.ownerNode.className && /(^|\s)no-css-gradients(\s|$)/i.test(stylesheet.ownerNode.className))
 			return;
 		
 		// We actually have to load the stylesheet in via XHR (inspired by
