@@ -1,5 +1,5 @@
 /* 
- * CSS Gradients via Canvas v1.2 <http://weston.ruter.net/projects/css-gradients-via-canvas/>
+ * CSS Gradients via Canvas v1.3 <http://weston.ruter.net/projects/css-gradients-via-canvas/>
  *  by Weston Ruter, Shepherd Interactive <http://www.shepherd-interactive.com/>
  *  Latest: http://shepherd-interactive.googlecode.com/svn/trunk/css-gradients-via-canvas/css-gradients-via-canvas.js
  * 
@@ -48,7 +48,8 @@ var config = cssGradientsViaCanvas;
 var div = document.createElement('div');
 div.style.cssText = [
 	"background-image:-webkit-gradient(linear, 0% 0%, 0% 100%, from(red), to(blue));",
-	"background-image:-moz-linear-gradient(top left, bottom right, from(red), to(blue));"
+	"background-image:-moz-linear-gradient(top left, bottom right, from(red), to(blue));", /*Firefox 3.6 Alpha*/
+	"background-image:-moz-linear-gradient(left, red, blue);" /*Firefox 3.6*/
 ].join('');
 if(div.style.backgroundImage){
 	config.enabled = false;
