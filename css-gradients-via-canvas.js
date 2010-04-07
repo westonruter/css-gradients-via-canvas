@@ -1,7 +1,7 @@
 /* 
  * CSS Gradients via Canvas v1.3 <http://weston.ruter.net/projects/css-gradients-via-canvas/>
  *  by Weston Ruter, Shepherd Interactive <http://www.shepherd-interactive.com/>
- *  Latest: http://shepherd-interactive.googlecode.com/svn/trunk/css-gradients-via-canvas/css-gradients-via-canvas.js
+ *  Latest: http://github.com/westonruter/css-gradients-via-canvas
  * 
  * Some comments include excerpts from "Introducing CSS Gradients" <http://webkit.org/blog/175/introducing-css-gradients/>
  * 
