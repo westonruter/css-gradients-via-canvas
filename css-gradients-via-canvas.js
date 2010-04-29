@@ -1,8 +1,9 @@
 /*!
  * CSS Gradients via Canvas v1.3
+ *  by Weston Ruter <http://weston.ruter.net/> @westonruter
  *  Homepage: http://weston.ruter.net/projects/css-gradients-via-canvas/
  *  Latest: http://github.com/westonruter/css-gradients-via-canvas
- *  Copyright (c) 2009: Weston Ruter <http://weston.ruter.net/>,
+ *  Copyright (c) 2009: Weston Ruter,
  *                      Shepherd Interactive <http://shepherdinteractive.com/>
  *  License: GPL <http://creativecommons.org/licenses/GPL/2.0/> and
  *           MIT <http://creativecommons.org/licenses/MIT/>
