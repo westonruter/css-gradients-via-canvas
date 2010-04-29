@@ -3,12 +3,12 @@ Homepage: http://weston.ruter.net/projects/css-gradients-via-canvas/
 Latest: http://github.com/westonruter/css-gradients-via-canvas
 
 Copyright (c) 2009:
-	Weston Ruter http://weston.ruter.net/
+    Weston Ruter http://weston.ruter.net/
     Shepherd Interactive http://shepherdinteractive.com/
 
 Licenses:
-   GPL http://creativecommons.org/licenses/GPL/2.0/
-   MIT http://creativecommons.org/licenses/MIT/
+    GPL http://creativecommons.org/licenses/GPL/2.0/
+    MIT http://creativecommons.org/licenses/MIT/
 
 Some comments include excerpts from "Introducing CSS Gradients"
   http://webkit.org/blog/175/introducing-css-gradients/
