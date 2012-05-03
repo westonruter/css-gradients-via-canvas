@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Comment Archive for CSS Gradients via Canvas</title>
+	</head>
+	<body>
+		<h1>Comment Archive for <a href="https://github.com/westonruter/css-gradients-via-canvas">CSS Gradients via Canvas</a></h1>
+		<p><em>This is just a raw copy of the comments left on my blog before I started redirecting to GitHub.</em></p>
+
+	<ol>
+			<li id="comment-7474" class=""><section><address><a href="http://blog.codedread.com/" rel="external nofollow" class="url" title="Visit commenter's website"><img alt="" src="http://1.gravatar.com/avatar/762d7f0a2c01fd33006fc8a4712b0941?s=80&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D80&amp;r=G" class="avatar avatar-80 photo" height="80" width="80" />Jeff Schiller</a>							</address>
+			<footer>
+				<a href="#comment-7474" rel="permalink" title="Permalink to this comment"><time datetime="2009-07-27T04:51:06+00:00">July 27th, 2009 at 4:51 am</time></a> 
+			</footer>
+
+			<p>Interesting.  Firefox and Opera support SVG so I wonder if it would have been wise to try and use SVG instead of Canvas?  Seems like you wouldn’t have to do a lot of redrawing if that’s the case since the browser would handle stretching for you.</p>
+<p>By the way, I’ve started a ‘gradient picker’ here: <a href="http://jgraduate.googlecode.com/" rel="nofollow">http://jgraduate.googlecode.com/</a> if you care to contribute.</p>
+
+					</section>
+		</li>
+			<li id="comment-7498" class="pingback"><section><address><a href="http://ajaxian.com/archives/css-gradients-for-all" rel="external nofollow" class="url">Ajaxian » CSS Gradients for All!</a>							</address>
+			<footer>
+				<a href="#comment-7498" rel="permalink" title="Permalink to this comment"><time datetime="2009-07-28T03:33:04+00:00">July 28th, 2009 at 3:33 am</time></a> 
+			</footer>
+
+			<p>[...] Ruter has created a very cool library that enables CSS gradients on non-WebKit browsers (at least, a subset). Incredibly cool:  CSS Gradients via Canvas provides a [...]</p>
+
+					</section>
+		</li>
+			<li id="comment-7500" class=""><section><address><a href="http://stoimen.com/blog/" rel="external nofollow" class="url" title="Visit commenter's website"><img alt="" src="http://1.gravatar.com/avatar/f8ec9e5a6adce849e7ecbc7024444697?s=80&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D80&amp;r=G" class="avatar avatar-80 photo" height="80" width="80" />stoimen</a>							</address>
+			<footer>
+				<a href="#comment-7500" rel="permalink" title="Permalink to this comment"><time datetime="2009-07-28T04:02:11+00:00">July 28th, 2009 at 4:02 am</time></a> 
+			</footer>
+
+			<p>Now that is cool, indeed. Very good job!</p>
+
+					</section>
+		</li>
+			<li id="comment-7505" class=""><section><address><a href="http://james.padolsey.com" rel="external nofollow" class="url" title="Visit commenter's website"><img alt="" src="http://0.gravatar.com/avatar/0277dde1b6440039c4225b60d52e8ff5?s=80&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D80&amp;r=G" class="avatar avatar-80 photo" height="80" width="80" />James</a>							</address>
+			<footer>
+				<a href="#comment-7505" rel="permalink" title="Permalink to this comment"><time datetime="2009-07-28T06:38:39+00:00">July 28th, 2009 at 6:38 am</time></a> 
+			</footer>
+
+			<p>Why not use “explorerCanvas” to support IE? (<a href="http://code.google.com/p/explorercanvas" rel="nofollow">http://code.google.com/p/explorercanvas</a>) It’s basically VML wrapped in a canvas-like API.</p>
+
+					</section>
+		</li>
+			<li id="comment-7507" class=""><section><address><a href="http://weston.ruter.net/" rel="external nofollow" class="url" title="Visit commenter's website"><img alt="" src="http://0.gravatar.com/avatar/22ed378fbf1d918ef43a45b2a1f34634?s=80&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D80&amp;r=G" class="avatar avatar-80 photo" height="80" width="80" />Weston Ruter</a>							</address>
+			<footer>
+				<a href="#comment-7507" rel="permalink" title="Permalink to this comment"><time datetime="2009-07-28T07:18:06+00:00">July 28th, 2009 at 7:18 am</time></a> 
+			</footer>
+
+			<p>@Jeff: SVG <a href="http://groups.google.com/group/mozilla.dev.tech.svg/browse_thread/thread/75f14ac7244b0fa5/a6ccf7261c5110b7?lnk=raot" title="SVG image not shown by Firefox @ Google Groups" rel="nofollow">cannot</a> currently be used as a background image in Firefox (and neither can a Canvas directly). But Canvas, unlike SVG, can be converted into a PNG via <code>toDataURI()</code>; this regular PNG can of course be used as a background image, as long as the browser supports <code>data:</code> URIs. So this is why Canvas is employed here. Nice benefit here of converting to PNG is that you can save the generated background image to disk and serve it as an external resource for un-supported browsers (read: Internet Explorer).</p>
+<p>@stoimen: Thanks!</p>
+<p>@James: explorerCanvas does not yet implement <code>toDataURI()</code>, so it is not usable. When explorerCanvas implements it, this project can be made to utilize it and bring CSS Gradients to IE8+.</p>
+
+					</section>
+		</li>
+			<li id="comment-7521" class=""><section><address><img alt="" src="http://0.gravatar.com/avatar/80727381b194de18edb2577291d6df1b?s=80&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D80&amp;r=G" class="avatar avatar-80 photo" height="80" width="80" />zem							</address>
+			<footer>
+				<a href="#comment-7521" rel="permalink" title="Permalink to this comment"><time datetime="2009-07-28T21:30:09+00:00">July 28th, 2009 at 9:30 pm</time></a> 
+			</footer>
+
+			<p>already using it. working great.</p>
+
+					</section>
+		</li>
+			<li id="comment-7818" class=""><section><address><a href="http://weston.ruter.net/" rel="external nofollow" class="url" title="Visit commenter's website"><img alt="" src="http://0.gravatar.com/avatar/22ed378fbf1d918ef43a45b2a1f34634?s=80&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D80&amp;r=G" class="avatar avatar-80 photo" height="80" width="80" />Weston Ruter</a>							</address>
+			<footer>
+				<a href="#comment-7818" rel="permalink" title="Permalink to this comment"><time datetime="2009-08-07T19:17:36+00:00">August 7th, 2009 at 7:17 pm</time></a> 
+			</footer>
+
+			<p>Looks like Firefox 3.6 is going to support CSS gradients natively! <a href="https://developer.mozilla.org/en/CSS/Gradients" rel="nofollow">https://developer.mozilla.org/en/CSS/Gradients</a></p>
+<p>It looks like the syntax is a bit different from WebKit’s, however. I plan to update this canvas implementation to also support the new variant Gecko syntax for CSS gradients.</p>
+<p>Now, if only MSIE would upgrade from its filter to this spec to provide the same functionality, especially so that text overlaying the gradients doesn’t lose its anti-aliasing!</p>
+
+					</section>
+		</li>
+			<li id="comment-9539" class=""><section><address><a href="http://www.i2u2.org/" rel="external nofollow" class="url" title="Visit commenter's website"><img alt="" src="http://1.gravatar.com/avatar/b2570f887714ef6ddfd73017bf4e213d?s=80&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D80&amp;r=G" class="avatar avatar-80 photo" height="80" width="80" />Phong Nguyen</a>							</address>
+			<footer>
+				<a href="#comment-9539" rel="permalink" title="Permalink to this comment"><time datetime="2009-09-30T13:09:08+00:00">September 30th, 2009 at 1:09 pm</time></a> 
+			</footer>
+
+			<p>This is pretty nice – except for one major issue I’ve seen. I’m using the jQuery UI library and it includes a fairly large CSS file (nearly 1700 lines!) that causes the forEach(document.styleSheets … ) loop to take a good long while to finish. This blocks the user from doing anything to the page – in my case, for 2-3 seconds. That’s pretty annoying for any user to have to deal with. </p>
+<p>Is there some way to speed up that core loop? (Failing that, I could try and detect if I’m loading certain large files and ignore them).</p>
+
+					</section>
+		</li>
+			<li id="comment-9548" class=""><section><address><a href="http://weston.ruter.net/" rel="external nofollow" class="url" title="Visit commenter's website"><img alt="" src="http://0.gravatar.com/avatar/22ed378fbf1d918ef43a45b2a1f34634?s=80&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D80&amp;r=G" class="avatar avatar-80 photo" height="80" width="80" />Weston Ruter</a>							</address>
+			<footer>
+				<a href="#comment-9548" rel="permalink" title="Permalink to this comment"><time datetime="2009-09-30T19:28:07+00:00">September 30th, 2009 at 7:28 pm</time></a> 
+			</footer>
+
+			<p>Excellent point, Phong! I just added the ability (version 1.2) to add the class “no-css-gradients” to prevent the script from examining the file for CSS Gradients. See <a href="http://weston.ruter.net/projects/css-gradients-via-canvas/#changelog" rel="nofollow">changelog</a>.</p>
+
+					</section>
+		</li>
+			<li id="comment-15894" class=""><section><address><a href="http://dan.cx/" rel="external nofollow" class="url" title="Visit commenter's website"><img alt="" src="http://0.gravatar.com/avatar/872578c4e56897b913fd03ed88daef51?s=80&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D80&amp;r=G" class="avatar avatar-80 photo" height="80" width="80" />Daniel15</a>							</address>
+			<footer>
+				<a href="#comment-15894" rel="permalink" title="Permalink to this comment"><time datetime="2010-04-04T07:04:12+00:00">April 4th, 2010 at 7:04 am</time></a> 
+			</footer>
+
+			<p>I suggest you add support for MooTools as well. Probably just have to check for window.MooTools and window.$$ like the Prototype check <img src="http://weston.ruter.net/wp-includes/images/smilies/icon_smile.gif" alt=":)" class="wp-smiley" /> </p>
+
+					</section>
+		</li>
+			<li id="comment-18088" class="pingback"><section><address><a href="http://www.smashingmagazine.com/2010/06/17/start-using-css3-today-techniques-and-tutorials/" rel="external nofollow" class="url">Start Using CSS3 Today: Techniques and Tutorials - Smashing Magazine</a>							</address>
+			<footer>
+				<a href="#comment-18088" rel="permalink" title="Permalink to this comment"><time datetime="2010-06-17T05:40:27+00:00">June 17th, 2010 at 5:40 am</time></a> 
+			</footer>
+
+			<p>[...] examine some of the differences in syntax when working with the -moz and -webkit vendor prefixes.(Kind of) Cross-Browser CSS Gradients via CanvasCSS Gradients via Canvas provides a subset of WebKit’s CSS Gradients proposal for browsers [...]</p>
+
+					</section>
+		</li>
+			<li id="comment-19457" class="pingback"><section><address><a href="http://jonraasch.com/blog/graceful-degradation-with-css3" rel="external nofollow" class="url">Graceful Degradation With CSS3 | Jon Raasch's Blog</a>							</address>
+			<footer>
+				<a href="#comment-19457" rel="permalink" title="Permalink to this comment"><time datetime="2010-08-17T09:58:11+00:00">August 17th, 2010 at 9:58 am</time></a> 
+			</footer>
+
+			<p>[...] Beyond IE, background gradients can be supported in Opera via canvas. [...]</p>
+
+					</section>
+		</li>
+			<li id="comment-20707" class="pingback"><section><address><a href="http://bestwebmagazine.com/2010/06/17/start-using-css3-today-techniques-and-tutorials/" rel="external nofollow" class="url">Start Using CSS3 Today: Techniques and Tutorials | Best Web Magazine</a>							</address>
+			<footer>
+				<a href="#comment-20707" rel="permalink" title="Permalink to this comment"><time datetime="2010-10-20T05:27:27+00:00">October 20th, 2010 at 5:27 am</time></a> 
+			</footer>
+
+			<p>[...] examine some of the differences in syntax when working with the -moz and -webkit vendor prefixes.(Kind of) Cross-Browser CSS Gradients via Canvas CSS Gradients via Canvas provides a subset of WebKit’s CSS Gradients proposal for browsers that [...]</p>
+
+					</section>
+		</li>
+			<li id="comment-24205" class=""><section><address><img alt="" src="http://1.gravatar.com/avatar/373b1392d0b45407254ae38220579445?s=80&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D80&amp;r=G" class="avatar avatar-80 photo" height="80" width="80" />dan87							</address>
+			<footer>
+				<a href="#comment-24205" rel="permalink" title="Permalink to this comment"><time datetime="2011-01-15T21:51:31+00:00">January 15th, 2011 at 9:51 pm</time></a> 
+			</footer>
+
+			<p>Interesting.  Firefox and Opera support SVG so I wonder if it would have been wise to try and use SVG instead of Canvas?  Seems like you wouldn</p>
+
+					</section>
+		</li>
+		</ol>
+
+</body>
+</html>
