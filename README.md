@@ -64,3 +64,4 @@
     additional <code>background-*</code> properties are not parsed out.</dd>
 </dl>
 
+<p><em>(Since I started redirecting from my blog to GitHub, I've archived the <a href="http://westonruter.github.com/css-gradients-via-canvas/wordpress-comment-archive.html">old comments</a> I had received there.)</em></p>
