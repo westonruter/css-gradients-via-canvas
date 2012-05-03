@@ -1,14 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8" />
-	<meta name="robots" content="follow,noindex" /><!-- see: http://weston.ruter.net/projects/css-gradients-via-canvas/ -->
-    <title>CSS Gradients via Canvas</title>
-	<meta http-equiv="refresh" content="2; url=http://weston.ruter.net/projects/css-gradients-via-canvas/#examples">
+    <meta charset="utf-8" />
+    <title>CSS Gradients via Canvas Examples</title>
 </head>
 <body>
-	
-	<p>You are being redirected to <a href="http://weston.ruter.net/projects/css-gradients-via-canvas/#examples">http://weston.ruter.net/projects/css-gradients-via-canvas/#examples</a></p>
+    <h1><a href="https://github.com/westonruter/css-gradients-via-canvas">CSS Gradients via Canvas</a> Examples</h1>
+    <style scoped="scoped">
+    #linear1 { width:150px; height:150px; border:2px solid black; /*padding: 10px; */
+           background-image:-webkit-gradient(linear, left top, left bottom, from(#00abeb), to(#fff), color-stop(0.5, #fff), color-stop(0.5, #66cc00)) !important;
+           background-image:-moz-linear-gradient(top, #00abeb, #fff 50%, #66cc00 50%, #fff) !important;
+           /*-webkit-background-origin: padding-box; -webkit-background-clip: content-box;*/ }
 
+    #linear2 {
+            border:2px solid black;
+            width:150px; height:150px;
+            /*Note: Only use gradients background-image, not background shortcut property. */
+            background-image: -webkit-gradient(linear, 0% 25%, 75% 100%,
+                                     from(red),
+                                     to(purple),
+                                     color-stop(.2, orange),
+                                     color-stop(.4, yellow),
+                                     color-stop(.6, green),
+                                     color-stop(.8, blue));
+            /* Note that the moz gradient doesn't quite look the same */
+            background-image: -moz-linear-gradient(top left,
+                                     red,
+                                     orange 20%,
+                                     yellow 40%,
+                                     green 60%,
+                                     blue 80%,
+                                     purple);
+            background-repeat:no-repeat;
+
+    }
+
+    #radial1 { width:150px; height:150px; border:2px solid black;
+           /*Note: Only use gradients background-image, not background shortcut property. */
+            background-image:
+                -webkit-gradient(radial, 45 45, 10, 52 50, 30, from(#A7D30C), to(rgba(1,159,98,0)), color-stop(90%, #019F62)),
+                -webkit-gradient(radial, 105 105, 20, 112 120, 50, from(#ff5f98), to(rgba(255,1,136,0)), color-stop(75%, #ff0188)),
+                -webkit-gradient(radial, 95 15, 15, 102 20, 40, from(#00c9ff), to(rgba(0,201,255,0)), color-stop(80%, #00b5e2)),
+                -webkit-gradient(radial, 0 150, 50, 0 140, 90, from(#f4f201), to(rgba(228, 199,0,0)), color-stop(80%, #e4c700));
+
+            /*-webkit-gradient(type, inner_center, inner_radius, outer_center, outer_radius, / stop...)*/
+            background-image:
+                -moz-radial-gradient(42px 42px, circle farthest-corner, #A7D30C 0%, #A7D30C 3%, rgba(1,159,98,0) 11%),
+                -moz-radial-gradient(45px 45px, circle farthest-corner, #019F62 0%, #019F62 13%, rgba(255,255,255,0) 16%, rgba(255,255,255,0) 100%),
+
+                -moz-radial-gradient(102px 102px, circle farthest-corner, #ff5f98 0%, #ff5f98 15%,  rgba(255,1,136,0) 27%),
+                -moz-radial-gradient(105px 105px, circle farthest-corner, #FF0188 0%, #FF0188 28%,  rgba(255,255,255,0) 32%, rgba(255,255,255,0) 100%),
+
+                -moz-radial-gradient(92px 12px, circle farthest-corner, #00c9ff 0%, #00c9ff 10%, rgba(0,181,226,0) 26%),
+                -moz-radial-gradient(95px 15px, circle farthest-corner, #00b5e2 0%, #00b5e2 28%, rgba(255,255,255,0) 31%, rgba(255,255,255,0) 100%),
+
+                -moz-radial-gradient(0px 150px, circle farthest-corner, #f4f201 0%, #f4f201 25%, rgba(228,199,0,0) 45%),
+                -moz-radial-gradient(0px 150px, circle farthest-corner, #e4c700 0%, #e4c700 47%, rgba(255,255,255,0) 50%, rgba(255,255,255,0) 100%);
+
+            /*background-image:-moz-radial-gradient(45px 45px, 10px, 45px 45px, 30px, from(#ff0000), to(#0000ff));*/
+            background-repeat:no-repeat;
+    }
+
+    /* Play around with some interactivity; requires manual mouseover/mouseout
+    handlers to be attached with Javascript to refresh CSS Gradients when box
+    is resized, see script and comments in footer. */
+    #linear2 {
+        border-color:#CCC;
+        border-style:outset;
+        cursor:pointer;
+        padding:0;
+    }
+    #linear2:hover {
+        border-color:#888;
+    }
+    html:not(.css-gradients-via-canvas) #linear2:active,
+    #linear2.mousedown {
+        width:400px;
+        border-style:inset;
+    }
+
+    p:target {
+        background-color:#FFFFCC;
+        padding:0.2em;
+    }
+
+    html.no-css-gradients img.fallback,
+    html.no-css-gradients #fallback-notice,
+    html.no-css-gradients .fallback-notice{
+        display:block !important;
+        color:red;
+    }
+    </style>
+
+    <p>The following two boxes are from WebKit's <a href="http://trac.webkit.org/browser/trunk/LayoutTests/fast/gradients/simple-gradients.html?format=raw">Background
+    Gradients Example</a> <small>(a couple browser-specific <code>background</code> properties are disabled in the first one)</small>:</p>
+
+    <p id='fallback-notice' hidden="hidden" style="display:none"><em>It appears that your browser doesn't support CSS Gradients, neither natively nor via Canvas.
+    The gradients you see below are regular externally-loaded PNG images that demonstrate the CSS gradient effects; the gradients were generated from
+    this Canvas implementation of CSS Gradients (see <a href="#browser-support">browser support</a> above).</em></p>
+
+    <p id="linear1" class='gradient'><img src="linear1.png" class='fallback' style="display:none" title="Fallback image; this is not a CSS Gradient!" /></p>
+
+    <p><em>Note the following WebKit radial gradient example is very dificult to reproduce using Firefox's syntax.
+    Special thanks to <a href="http://cse-mjmcl.cse.bris.ac.uk/blog/">Mark McLaren</a> for
+    <a href="http://twitter.com/markjmclaren/status/13067366701" title="markjmclaren: @westonruter, Hope this works! http://jsfiddle.net/ujY6E/36/ Not your momma's -moz-radial-gradient!">writing</a>
+    a <a href="http://jsfiddle.net/ujY6E/36/" title="Porting WebKit CSS Radial Gradient Example to Firefox - jsFiddle">close fascimile</a> which appears below:</em></p>
+
+    <p id="radial1" class='gradient'><img src="radial1.png" class='fallback' style="display:none" title="Fallback image; this is not a CSS Gradient!" /></p>
+
+    <p>Here is a bonus diagonal rainbow…but wait, there's more! Clicking on the element causes its width to increase and when it does, its gradient is adjusted (see <a href="#notes">notes</a> above).
+    <em hidden="hidden" class='fallback-notice' style="display:none;">(Clicking will not have the desired effect because, again, it appears your browser is not supported.)</em></p>
+
+    <p id="linear2" class='gradient'><img src="linear2.png" class='fallback' style="display:none" title="Fallback image; this is not a CSS Gradient!" /></p>
+
+
+    <!-- jQuery, Prototype, and Sizzle looked for in the case that document.querySelectorAll is not available;
+    if using another library, please make sure that document.querySelectorAll is implemented -->
+    <!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>-->
+
+    <script src="css-gradients-via-canvas.js"></script>
+    <script>
+    //Add mousedown/mouseup event handlers to correspond with the :active rule that changes the element's width
+    // because the CSS Gradient needs to be refreshed because the box size changes; note that we add the class manually
+    // because CSS rules aren't applied before the corresponding events are triggered (thus the box would not
+    // be resized when the event handler inspects it).
+
+    if(document.addEventListener){
+        document.addEventListener('DOMContentLoaded', function(){
+            var linear2 = document.getElementById('linear2');
+            linear2.addEventListener('mouseup', function(){
+                if(this.refreshCSSGradient){
+                    this.className = this.className.replace(/\s*mousedown/, '');
+                    this.refreshCSSGradient();
+                }
+            }, false);
+            linear2.addEventListener('mousedown', function(){
+                if(this.refreshCSSGradient){
+                    this.className += " mousedown";
+                    this.refreshCSSGradient();
+                }
+            }, false);
+        }, false);
+    }
+    </script>
+
+    <hr>
+    <footer>
+        <p><a href="https://github.com/westonruter/css-gradients-via-canvas">CSS Gradients via Canvas</a></p>
+    </footer>
 </body>
 </html>
