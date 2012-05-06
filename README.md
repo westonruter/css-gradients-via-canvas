@@ -65,3 +65,5 @@
 </dl>
 
 <p><em>(Since I started redirecting from my blog to GitHub, I've archived the <a href="http://westonruter.github.com/css-gradients-via-canvas/wordpress-comment-archive.html">old comments</a> I had received there.)</em></p>
+<hr>
+<p>Developed by <a href="http://westonruter.github.com/" rel="author">Weston Ruter</a> (<a href="https://twitter.com/westonruter">@westonruter</a>).</p>
